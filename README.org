@@ -7,22 +7,24 @@
 ** Setup package.el to work with MELPA, ELPA and ORG
 
 #+begin_src emacs-lisp
-(require 'package)
+    (require 'package)
 
-(setq package-archives '(("melpa" . "https://melpa.org/packages/")
-                         ("org" . "https://orgmode.org/elpa/")
-                         ("elpa" . "https://elpa.gnu.org/packages/")))
+    (setq package-archives '(("melpa" . "https://melpa.org/packages/")
+			     ("org" . "https://orgmode.org/elpa/")
+			     ("elpa" . "https://elpa.gnu.org/packages/")))
 
-(package-initialize)
+    (package-initialize)
 
-(unless package-archive-contents
-  (package-refresh-contents))
+    (unless package-archive-contents
+      (package-refresh-contents))
 
-;; Initialize use-package on non-Linux platforms
-(unless (package-installed-p 'use-package)
-  (package-install 'use-package))
+    ;; Initialize use-package on non-Linux platforms
+    (unless (package-installed-p 'use-package)
+      (package-install 'use-package))
 
-(require 'use-package)
+    (require 'use-package)
+    (require 'use-package-ensure)
+    (setq use-package-always-ensure t)
 #+end_src
 
 ** =use-package= auto updates
@@ -40,6 +42,7 @@
 
 * Files
 ** Modules
+
 #+begin_src emacs-lisp
   (use-package recentf
     :config
@@ -56,32 +59,40 @@
   :ensure t)
 #+end_src
 
+** Windows decorations off
+
+#+begin_src emacs-lisp
+  (menu-bar-mode -1)
+  (tool-bar-mode -1)
+  (tooltip-mode -1) 
+  (scroll-bar-mode -1)
+#+end_src
+
 ** TODO Dashboard
+
 #+begin_src emacs-lisp
-(use-package dashboard
-  :ensure t
-  :init
-  (setq dashboard-set-heading-icons t)
-  (setq dashboard-set-file-icons t)
-  (setq dashboard-banner-logo-title "Emacs > All")
-  (setq dashboard-startup-banner 'logo) ;; use standard emacs logo as banner
-  ;;(setq dashboard-center-content nil) ;; set to 't' for centered content
-  (setq dashboard-items '((recents . 5)
-                          (agenda . 5 )
-                          (bookmarks . 3)
-                          (projects . 3)
-                          (registers . 3)))
-  :config
-  (dashboard-setup-startup-hook)
-  (dashboard-modify-heading-icons '((recents . "file-text")
-                                    (bookmarks . "book"))))
+  (use-package page-break-lines) ; optional dependency
+  (setq inhibit-startup-message t)
+  (use-package dashboard
+    :ensure t
+    :init
+    (setq dashboard-set-heading-icons t)
+    (setq dashboard-set-file-icons t)
+    (setq dashboard-banner-logo-title "Emacs > All")
+    (setq dashboard-startup-banner 'official)
+    (setq dashboard-items '((recents . 5)
+			    (agenda . 5 )
+			    (bookmarks . 3)
+			    (projects . 3)))
+    :config
+    (dashboard-setup-startup-hook)
+    )
 #+end_src
 
-This setting ensures that =emacsclient= always opens on dashboard rather than scratch.
+Ensures that =emacsclient= always opens on dashboard rather than scratch.
 #+begin_src emacs-lisp
-;;  (setq initial-buffer-choice (lambda () (get-buffer "*dashboard*")))
+ ;; (setq initial-buffer-choice (lambda () (get-buffer "*dashboard*")))
 #+end_src
-
 ** Theme
 
 #+begin_src emacs-lisp
@@ -93,14 +104,6 @@ This setting ensures that =emacsclient= always opens on dashboard rather than sc
           doom-themes-enable-italic t)
 
     (load-theme 'doom-dracula t))
-#+end_src
-
-** Windows decorations off
-
-#+begin_src emacs-lisp
-(menu-bar-mode -1)
-(tool-bar-mode -1)
-(scroll-bar-mode -1)
 #+end_src
 
 ** Fonts
@@ -150,8 +153,9 @@ Prevent the display of line numbers for some modes:
 
 #+begin_src emacs-lisp
   (dolist (mode '(term-mode-hook
-                  eshell-mode-hook
-                  calendar-mode-hook))
+		  eshell-mode-hook
+		  treemacs-mode-hook
+		  calendar-mode-hook))
     (add-hook mode (lambda () (display-line-numbers-mode 0))))
 #+end_src
 
@@ -164,18 +168,19 @@ Prevent the display of line numbers for some modes:
 * Which Key
 
 #+begin_src emacs-lisp
-(use-package which-key
-  :defer 0
-  :diminish which-key-mode
-  :init
-  (setq which-key-sort-order #'which-key-key-order-alpha
-        which-key-sort-uppercase-first nil
-        which-key-add-column-padding 1
-        which-key-max-display-columns nil
-        which-key-min-display-lines 6
-        which-key-side-window-slot -10)
+  (use-package which-key
+    :defer 0
+    :diminish which-key-mode
+    :init
+    (setq which-key-sort-order #'which-key-key-order-alpha
+	  which-key-sort-uppercase-first nil
+	  which-key-add-column-padding 1
+	  which-key-max-display-columns nil
+	  which-key-min-display-lines 6
+	  which-key-side-window-slot -10
+	  which-key-separator " → ")
 
-  (which-key-mode))
+    (which-key-mode))
 #+end_src
 
 * Key bindings
@@ -189,32 +194,43 @@ Make ESC qui prompts.
 ** Evil mode
 
 #+begin_src emacs-lisp
-(use-package evil
-  :init
-  (setq evil-want-integration t) ;; This is optional since it's already set to t by default.
-  (setq evil-want-keybinding nil)
-  (setq evil-vsplit-window-right t)
-  (setq evil-split-window-below t)
-  (setq evil-undo-system 'undo-redo)
-  :config
-  (evil-mode 1)
+  (use-package evil
+    :init
+    (setq evil-want-integration t
+	  evil-want-keybinding nil
+	  evil-vsplit-window-right t
+	  evil-split-window-below t
+	  evil-want-C-u-scroll t
+	  evil-undo-system 'undo-redo)
+    :config
+    (evil-mode 1)
 
-  (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
+    (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
 
-  ;; Use visual line motions even outside of visual-line-mode buffers
-  (evil-global-set-key 'motion "j" 'evil-next-visual-line)
-  (evil-global-set-key 'motion "k" 'evil-previous-visual-line)
+    ;; Use visual line motions even outside of visual-line-mode buffers
+    ;; (evil-global-set-key 'motion "j" 'evil-next-visual-line)
+    ;; (evil-global-set-key 'motion "k" 'evil-previous-visual-line)
 
-  (evil-set-initial-state 'messages-buffer-mode 'normal)
-  (evil-set-initial-state 'dashboard-mode 'normal)
-  )
+    (evil-set-initial-state 'messages-buffer-mode 'normal)
+    (evil-set-initial-state 'dashboard-mode 'normal)
+    )
 
-(use-package evil-collection
-  :after evil
-  :config
-  (setq evil-collection-mode-list '(dashboard dired ibuffer))
-  (evil-collection-init))
+  (use-package evil-collection
+    :after evil
+    :config
+    (setq evil-collection-mode-list '(dashboard dired ibuffer magit))
+    (evil-collection-init))
 
+#+end_src
+
+*** Bindings
+
+#+begin_src emacs-lisp
+  (general-evil-define-key 'normal 'global
+    "g c c" #'evilnc-comment-or-uncomment-lines)
+  (general-evil-define-key 'visual 'global
+    "g c" #'evilnc-comment-or-uncomment-lines
+    "g r" #'eval-region)
 #+end_src
 
 ** General
@@ -223,8 +239,9 @@ Make ESC qui prompts.
   (use-package general
     :after evil
     :config
+    (general-evil-setup t)
     (general-create-definer tf/leader-keys
-      :keymaps '(normal insert visual emacs)
+      :keymaps '(normal insert visual emacs help-map)
       :prefix "SPC"
       :global-prefix "C-SPC")
     )
@@ -296,7 +313,6 @@ Bind "SPC h" to "C-h".
    "rr" '((lambda () (interactive) (load-file "~/.emacs.d.gnu/init.el")) :which-key "Reload Emacs config")
    )
 #+end_src
-
 
 ** Files
 
@@ -413,16 +429,16 @@ Makes M-x remember the history.
 ** General variables
 
 #+begin_src emacs-lisp
-(setq
- org-directory "~/Documents/orgfiles/"
- org-ellipsis " ▼"
- org-src-fontify-natively t
- org-src-tab-acts-natively t
- org-confirm-babel-evaluate nil
- org-edit-src-code-indentation 0
- org-blank-before-new-entry (quote ((heading . nil)
-                                    (plain-list-item . nil)))
- )
+  (setq
+   org-directory "~/Documents/orgfiles/"
+   org-ellipsis " ▼"
+   org-src-fontify-natively t
+   org-src-tab-acts-natively t
+   org-confirm-babel-evaluate nil
+   org-edit-src-code-indentation 0
+   org-blank-before-new-entry (quote ((heading . nil)
+				      (plain-list-item . nil)))
+   )
 #+end_src
 
 ** Bullets
@@ -434,7 +450,7 @@ Makes M-x remember the history.
 
 ** Source block
 
-Org-tempo is a package that allows for =<s= followed by TAB to expand to a begin_src tag.  Other expansions available include:
+Allows for =<s= followed by TAB to expand to a begin_src tag.  Other expansions available include:
 
 | Typing the below + TAB | Expands to             |
 |------------------------+------------------------|
@@ -461,6 +477,13 @@ Org-tempo is a package that allows for =<s= followed by TAB to expand to a begin
     :commands toc-org-enable
     :init (add-hook 'org-mode-hook 'toc-org-enable)
     )
+#+end_src
+
+** Keymaps
+
+#+begin_src emacs-lisp
+  (general-evil-define-key 'normal org-mode-map
+    "TAB" 'org-cycle)
 #+end_src
 
 * Prog mode
@@ -499,13 +522,14 @@ Org-tempo is a package that allows for =<s= followed by TAB to expand to a begin
     )
 #+end_src
 
-* TODO Commenting
+* Commenting
 
 The keybinding needs to be added.
 
 #+begin_src emacs-lisp
   (use-package evil-nerd-commenter
-    )
+    :after evil
+    :commands evilnc-comment-or-uncomment-lines)
 #+end_src
 
 * Helpful
@@ -523,3 +547,26 @@ The keybinding needs to be added.
   ([remap describe-key] . helpful-key))
 #+end_src
 
+* Magit
+
+#+begin_src emacs-lisp
+  (use-package magit
+    :commands magit-status)
+
+  (tf/leader-keys
+    "g" '(:ignore t :which-key "git")
+    "g g" '(magit-status :which-key "Magit status"))
+
+  (use-package forge
+    :after magit)
+#+end_src
+
+
+* Completion
+
+#+begin_src emacs-lisp
+  (use-package vertico
+    :init
+    (vertico-mode)
+   ) 
+#+end_src
