@@ -1,3 +1,5 @@
+init.el
+
 /README.el
 /elpa/
 /emojis/
@@ -6,3 +8,5 @@
 /.last-package-update-day
 /history
 /projectile-bookmarks.eld
+/recentf
+/transient/

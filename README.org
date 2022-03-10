@@ -257,16 +257,6 @@ Make ESC qui prompts.
 
 #+end_src
 
-*** Bindings
-
-#+begin_src emacs-lisp
-  (general-evil-define-key 'normal 'global
-    "g c c" #'evilnc-comment-or-uncomment-lines)
-  (general-evil-define-key 'visual 'global
-    "g c" #'evilnc-comment-or-uncomment-lines
-    "g r" #'eval-region)
-#+end_src
-
 ** General
 
 #+begin_src emacs-lisp
@@ -281,7 +271,14 @@ Make ESC qui prompts.
     )
 #+end_src
 
-** Main leader menu
+#+begin_src emacs-lisp
+  (general-evil-define-key 'normal 'global
+    "g c c" #'evilnc-comment-or-uncomment-lines)
+  (general-evil-define-key 'visual 'global
+    "g c" #'evilnc-comment-or-uncomment-lines
+    "g r" #'eval-region)
+#+end_src
+
 
 #+begin_src emacs-lisp
   (tf/leader-keys
@@ -289,8 +286,6 @@ Make ESC qui prompts.
    "`" '(evil-switch-to-windows-last-buffer :which-key "Switch to last buffer")
    )
 #+end_src
-
-** Buffers
 
 #+begin_src emacs-lisp
 (tf/leader-keys
@@ -303,8 +298,6 @@ Make ESC qui prompts.
  )
 #+end_src
 
-** Search
-
 #+begin_src emacs-lisp
   (tf/leader-keys
     "s" '(:ignore t :which-key "search")
@@ -313,8 +306,6 @@ Make ESC qui prompts.
     )
 #+end_src
 
-** Toggles
-
 #+begin_src emacs-lisp
   (tf/leader-keys
    "t" '(:ignore t :which-key "toggle")
@@ -322,15 +313,12 @@ Make ESC qui prompts.
    )
 #+end_src
 
-** Windows
 Bind "SPC w" to "C-w".
 #+begin_src emacs-lisp
   (tf/leader-keys
-    "w" '(evil-window-map :which-key "window")
-   )
+    "w" '(evil-window-map :which-key "window"))
 #+end_src
 
-** Help
 Bind "SPC h" to "C-h".
 #+begin_src emacs-lisp
   (tf/leader-keys
@@ -349,8 +337,6 @@ Bind "SPC h" to "C-h".
    )
 #+end_src
 
-** Files
-
 #+begin_src emacs-lisp
 (tf/leader-keys
  "f" '(:ignore t :which-key "file")
@@ -365,8 +351,6 @@ Bind "SPC h" to "C-h".
  ;; "f p" TODO
  )
 #+end_src
-
-** Quit
 
 #+begin_src emacs-lisp
   (tf/leader-keys
@@ -473,7 +457,7 @@ Allows for =<s= followed by TAB to expand to a begin_src tag.  Other expansions 
 #+begin_src emacs-lisp
   (use-package projectile
     :config (projectile-mode)
-    :custom ((projectile-completion-system 'ivy))
+    :custom ((projectile-completion-system 'auto))
     )
 #+end_src
 
