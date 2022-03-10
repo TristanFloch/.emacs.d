@@ -40,17 +40,6 @@
   (auto-package-update-at-time "09:00"))
 #+end_src
 
-* Files
-** Modules
-
-#+begin_src emacs-lisp
-  (use-package recentf
-    :config
-    (recentf-mode))
-
-  (use-package sudo-edit)
-#+end_src
-
 * Appearance
 ** Icons
 
@@ -183,6 +172,51 @@ Prevent the display of line numbers for some modes:
     (which-key-mode))
 #+end_src
 
+* Vertico
+
+#+begin_src emacs-lisp
+
+  ;; builtins emacs variables
+  (setq read-file-name-completion-ignore-case t
+	read-buffer-completion-ignore-case t
+	completion-ignore-case t)
+
+  (use-package vertico
+    :bind (:map vertico-map
+		("C-j" . vertico-next)
+		("C-k" . vertico-previous))
+    :custom
+    (vertico-cycle t)
+    :init
+    (vertico-mode))
+  #+end_src
+
+Fuzzy search completion
+  
+#+begin_src emacs-lisp
+  (use-package orderless
+    :custom (completion-styles '(orderless)))
+#+end_src
+
+Builtin package to remember history for commands
+
+#+begin_src emacs-lisp
+  (use-package savehist
+    :init
+    (savehist-mode))
+#+end_src
+
+Adds information for completions
+
+#+begin_src emacs-lisp
+  (use-package marginalia
+    :after vertico
+    :custom
+    (marginalia-annotators '(marginalia-annotators-heavy marginalia-annotators-light nil))
+    :init
+    (marginalia-mode))
+ #+end_src
+  
 * Key bindings
 ** Better escape
 
@@ -262,8 +296,9 @@ Make ESC qui prompts.
 (tf/leader-keys
  "b" '(:ignore t :which-key "buffers")
  "bk" '(kill-current-buffer :which-key "Kill buffer")
- "bb" '(ivy-switch-buffer :which-key "Switch workspace buffer")
- "bB" '(counsel-switch-buffer :which-key "Switch buffer")
+ "bb" '(switch-to-buffer :which-key "Switch workspace buffer")
+ "bB" '(switch-to-buffer :which-key "Switch buffer")
+ "bi" '(ibuffer :which-key "iBuffer")
  "bs" '(basic-save-buffer :which-key "Save buffer")
  )
 #+end_src
@@ -364,67 +399,6 @@ Bind "SPC h" to "C-h".
 (use-package all-the-icons-dired)
 #+end_src
 
-* Ivy and Counsel
-** Ivy
-
-#+begin_src emacs-lisp
-(use-package ivy
-  :defer 0.1
-  :bind (:map ivy-minibuffer-map
-         ("C-l" . ivy-alt-done)
-         ("C-j" . ivy-next-line)
-         ("C-k" . ivy-previous-line)
-         :map ivy-switch-buffer-map
-         ("C-k" . ivy-previous-line)
-         ("C-l" . ivy-done)
-         ("C-d" . ivy-switch-buffer-kill)
-         :map ivy-reverse-i-search-map
-         ("C-k" . ivy-previous-line)
-         ("C-d" . ivy-reverse-i-search-kill))
-  :config (ivy-mode 1)
-  )
-#+end_src
-
-** Ivy Rich
-
-This gets us descriptions in M-x.
-
-#+begin_src emacs-lisp
-  (use-package ivy-rich
-    :after ivy
-    :custom
-    (ivy-virtual-abbreviate 'full
-     ivy-rich-switch-buffer-align-virtual-buffer t
-     ivy-rich-path-style 'abbrev)
-    :config
-    (ivy-set-display-transformer 'ivy-switch-buffer
-                                 'ivy-rich-switch-buffer-transformer)
-    (ivy-rich-mode 1))
-#+end_src
-
-** Counsel
-#+begin_src emacs-lisp
-  (use-package counsel
-    :after ivy
-    :config
-    (counsel-mode 1))
-#+end_src
-
-* M-x tweaks
-
-Removes the ‘^’ in things like counsel-M-x and other ivy/counsel prompts. The default ‘^’ string means that if you type something immediately after this string only completion candidates that begin with what you typed are shown.  Most of the time, I’m searching for a command without knowing what it begins with though.
-
-#+begin_src emacs-lisp
-(setq ivy-initial-inputs-alist nil)
-#+end_src
-
-Makes M-x remember the history.
-
-#+begin_src emacs-lisp
-(use-package smex)
-(smex-initialize)
-#+end_src
-
 * Org mode config
 ** General variables
 
@@ -501,11 +475,6 @@ Allows for =<s= followed by TAB to expand to a begin_src tag.  Other expansions 
     :config (projectile-mode)
     :custom ((projectile-completion-system 'ivy))
     )
-
-  (use-package counsel-projectile
-    :after projectile
-    :config (counsel-projectile-mode)
-    )
 #+end_src
 
 #+begin_src emacs-lisp
@@ -562,11 +531,3 @@ The keybinding needs to be added.
 #+end_src
 
 
-* Completion
-
-#+begin_src emacs-lisp
-  (use-package vertico
-    :init
-    (vertico-mode)
-   ) 
-#+end_src

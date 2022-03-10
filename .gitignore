@@ -2,3 +2,7 @@
 /elpa/
 /emojis/
 *~
+/#README.org#
+/.last-package-update-day
+/history
+/projectile-bookmarks.eld
