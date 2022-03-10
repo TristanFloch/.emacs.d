@@ -144,6 +144,7 @@ Prevent the display of line numbers for some modes:
   (dolist (mode '(term-mode-hook
 		  eshell-mode-hook
 		  treemacs-mode-hook
+		  dired-mode-hook
 		  calendar-mode-hook))
     (add-hook mode (lambda () (display-line-numbers-mode 0))))
 #+end_src
