@@ -175,6 +175,14 @@ Prevent the display of line numbers for some modes:
     (which-key-mode))
 #+end_src
 
+* Files
+
+#+begin_src emacs-lisp
+  (recentf-mode 1)
+  (setq recentf-max-menu-items 25)
+  (setq recentf-max-saved-items 25)
+#+end_src
+
 * Vertico and consult
 
 Builtins emacs variables
@@ -249,6 +257,7 @@ Builtin package to remember history for commands
 
 #+begin_src emacs-lisp
   (use-package savehist
+    :ensure nil
     :init
     (savehist-mode))
 #+end_src
@@ -361,7 +370,7 @@ Make ESC qui prompts.
 
    "f" '(:ignore t :which-key "file")
    "ff" '(find-file :which-key "Find file")
-   "fr" '(recentf-open-files :which-key "Recent files")
+   "fr" '(consult-recent-file :which-key "Recent files")
    "fC" '(copy-file :which-key "Copy this file")
    "fs" '(save-buffer :which-key "Save file")
    "fD" '(delete-file :which-key "Delete this file")
@@ -522,12 +531,12 @@ The keybinding needs to be added.
 (use-package helpful
   :commands (helpful-callable helpful-variable helpful-command helpful-key)
   :custom
-  (counsel-describe-function-function #'helpful-callable)
-  (counsel-describe-variable-function #'helpful-variable)
+  (describe-function #'helpful-callable)
+  (describe-variable #'helpful-variable)
   :bind
-  ([remap describe-function] . counsel-describe-function)
+  ([remap describe-function] . describe-function)
   ([remap describe-command] . helpful-command)
-  ([remap describe-variable] . counsel-describe-variable)
+  ([remap describe-variable] . describe-variable)
   ([remap describe-key] . helpful-key))
 #+end_src
 
