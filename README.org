@@ -183,6 +183,42 @@ Prevent the display of line numbers for some modes:
   (setq recentf-max-saved-items 25)
 #+end_src
 
+* Dired
+
+#+begin_src emacs-lisp
+  (use-package dired
+    :ensure nil
+    :init
+    (setq dired-dwim-target t  ; suggest a target for moving/copying intelligently
+	  dired-hide-details-hide-symlink-targets nil
+
+	  ;; don't prompt to revert, just do it
+	  dired-auto-revert-buffer #'dired-buffer-stale-p
+
+	  ;; Always copy/delete recursively
+	  dired-recursive-copies  'always
+	  dired-recursive-deletes 'top
+	  ;; Ask whether destination dirs should get created when copying/removing files.
+	  dired-create-destination-dirs 'always)
+      )
+
+
+  (use-package all-the-icons-dired
+    :hook (dired-mode . all-the-icons-dired-mode)
+    :config
+    (setq all-the-icons-dired-monochrome nil)
+    )
+#+end_src
+
+#+begin_src emacs-lisp
+  ;; TODO add binding for this
+  (use-package fd-dired
+    :defer t
+    :init
+    (global-set-key [remap find-dired] #'fd-dired)
+    )
+#+end_src
+
 * Vertico and consult
 
 Builtins emacs variables
@@ -413,11 +449,6 @@ Make ESC qui prompts.
 
 (tf/leader-keys
  "ts" '(hydra-text-scale/body :which-key "Scale text"))
-#+end_src
-* TODO Dired
-
-#+begin_src emacs-lisp
-(use-package all-the-icons-dired)
 #+end_src
 
 * Org mode config
