@@ -152,7 +152,9 @@ Prevent the display of line numbers for some modes:
 ** TODO Cursor
 
 #+begin_src emacs-lisp
-(setq cursor-in-non-selected-windows nil)
+  (setq cursor-in-non-selected-windows nil)
+  (blink-cursor-mode 0)
+  (global-hl-line-mode)
 #+end_src
 
 * Which Key
