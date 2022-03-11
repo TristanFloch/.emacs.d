@@ -1,7 +1,7 @@
 #+TITLE: My literate GNU Emacs config
 #+AUTHOR: Tristan Floch
-#+PROPERTY: header-args :results silent :tangle "./init.el"
 
+#+PROPERTY: header-args :results silent :tangle "./init.el"
 #+STARTUP: overview
 
 * Package management
@@ -45,8 +45,7 @@
 ** Icons
 
 #+begin_src emacs-lisp
-(use-package all-the-icons
-  :ensure t)
+(use-package all-the-icons)
 #+end_src
 
 ** Windows decorations off
@@ -80,9 +79,11 @@
 #+end_src
 
 Ensures that =emacsclient= always opens on dashboard rather than scratch.
+
 #+begin_src emacs-lisp
  ;; (setq initial-buffer-choice (lambda () (get-buffer "*dashboard*")))
 #+end_src
+
 ** Theme
 
 #+begin_src emacs-lisp
@@ -153,7 +154,7 @@ Prevent the display of line numbers for some modes:
     (add-hook mode (lambda () (display-line-numbers-mode 0))))
 #+end_src
 
-** TODO Cursor
+** Cursor
 
 #+begin_src emacs-lisp
   (setq cursor-in-non-selected-windows nil)
@@ -464,8 +465,10 @@ Make ESC qui prompts.
    org-confirm-babel-evaluate nil
    org-edit-src-code-indentation 0
    org-blank-before-new-entry (quote ((heading . nil)
-				      (plain-list-item . nil)))
+                                      (plain-list-item . nil)))
    )
+
+  (add-hook 'org-mode-hook 'org-indent-mode)
 #+end_src
 
 ** Bullets
@@ -494,7 +497,7 @@ Allows for =<s= followed by TAB to expand to a begin_src tag.  Other expansions 
 
 #+begin_src emacs-lisp
 (use-package org-tempo
-  :ensure nil) ;; tell use-package not to try to install org-tempo since it's already there.
+  :ensure nil)
 #+end_src
 
 ** Table of contents
