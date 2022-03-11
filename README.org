@@ -1,5 +1,6 @@
 #+TITLE: My literate GNU Emacs config
 #+AUTHOR: Tristan Floch
+#+PROPERTY: header-args :results silent :tangle "./init.el"
 
 #+STARTUP: overview
 
@@ -617,4 +618,15 @@ The keybinding needs to be added.
     :after magit)
 #+end_src
 
+* Literate
 
+Keep a custom file to not pollute this one
+
+#+begin_src emacs-lisp
+  (setq custom-file (concat user-emacs-directory "custom.el"))
+  (load custom-file t)
+#+end_src
+
+;; Local Variables:
+;; eval: (add-hook 'after-save-hook 'org-babel-tangle)
+;; End:

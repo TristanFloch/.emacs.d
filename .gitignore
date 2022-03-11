@@ -1,5 +1,3 @@
-init.el
-
 /README.el
 /elpa/
 /emojis/
@@ -11,3 +9,5 @@ init.el
 /recentf
 /transient/
 /projects
+/custom.el
+/init.el
