@@ -313,7 +313,6 @@ Make ESC qui prompts.
   (use-package evil-collection
     :after evil
     :config
-    (setq evil-collection-mode-list '(dashboard dired ibuffer magit))
     (evil-collection-init))
 
 #+end_src
@@ -326,7 +325,7 @@ Make ESC qui prompts.
     :config
     (general-evil-setup t)
     (general-create-definer tf/leader-keys
-      :keymaps '(normal insert visual emacs help-map)
+      :keymaps '(normal visual emacs help-map)
       :prefix "SPC"
       :global-prefix "C-SPC")
     )
