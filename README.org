@@ -60,22 +60,22 @@
 ** TODO Dashboard
 
 #+begin_src emacs-lisp
-  (use-package page-break-lines) ; optional dependency
-  (setq inhibit-startup-message t)
-  (use-package dashboard
-    :ensure t
-    :init
-    (setq dashboard-set-heading-icons t)
-    (setq dashboard-set-file-icons t)
-    (setq dashboard-banner-logo-title "Emacs > All")
-    (setq dashboard-startup-banner 'official)
-    (setq dashboard-items '((recents . 5)
-			    (agenda . 5 )
-			    (bookmarks . 3)
-			    (projects . 3)))
-    :config
-    (dashboard-setup-startup-hook)
-    )
+(use-package page-break-lines) ; optional dependency
+(setq inhibit-startup-message t)
+(use-package dashboard
+  :ensure t
+  :init
+  (setq dashboard-set-heading-icons t)
+  (setq dashboard-set-file-icons t)
+  (setq dashboard-banner-logo-title "Emacs > All")
+  (setq dashboard-startup-banner 'official)
+  (setq dashboard-items '((recents . 5)
+                          (agenda . 5 )
+                          (bookmarks . 3)
+                          (projects . 3)))
+  :config
+  (dashboard-setup-startup-hook)
+  )
 #+end_src
 
 Ensures that =emacsclient= always opens on dashboard rather than scratch.
@@ -191,9 +191,6 @@ Prevent the display of line numbers for some modes:
     :init
     (setq dired-dwim-target t  ; suggest a target for moving/copying intelligently
 	  dired-hide-details-hide-symlink-targets nil
-
-	  ;; don't prompt to revert, just do it
-	  dired-auto-revert-buffer #'dired-buffer-stale-p
 
 	  ;; Always copy/delete recursively
 	  dired-recursive-copies  'always
