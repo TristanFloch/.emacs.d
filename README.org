@@ -161,7 +161,8 @@ Prevent the display of line numbers for some modes:
 ** Cursor
 
 #+begin_src emacs-lisp
-  (setq cursor-in-non-selected-windows nil)
+  (setq-default cursor-in-non-selected-windows nil)
+  (setq highlight-nonselected-windows nil)
   (blink-cursor-mode 0)
   (global-hl-line-mode)
 #+end_src
