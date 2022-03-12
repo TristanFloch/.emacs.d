@@ -508,7 +508,37 @@ Addon for icons in marginalia mode
 Front end for vertico
 
 #+begin_src emacs-lisp
-  (use-package consult)
+  (use-package consult
+    :init
+    ;; Optionally tweak the register preview window.
+    ;; This adds thin lines, sorting and hides the mode line of the window.
+    (advice-add #'register-preview :override #'consult-register-window)
+
+    ;; Optionally replace `completing-read-multiple' with an enhanced version.
+    (advice-add #'completing-read-multiple :override #'consult-completing-read-multiple)
+
+    ;; Use Consult to select xref locations with preview
+    (setq xref-show-xrefs-function #'consult-xref
+          xref-show-definitions-function #'consult-xref)
+
+    :config
+    (consult-customize
+     ;; No preview by default for those commands
+     consult-buffer consult-recent-file
+     :preview-key (kbd "C-SPC"))
+
+    (consult-customize
+     consult-theme :preview-key (list (kbd "C-SPC") :debounce 0.5 'any))
+    )
+
+  (use-package consult-dir
+    :bind (([remap list-directory] . consult-dir)
+           :map vertico-map
+           ("C-x C-d" . consult-dir)
+           ("C-x C-j" . consult-dir-jump-file)))
+
+  (use-package consult-flycheck
+    :after (consult flycheck))
 #+end_src
 
 * Key bindings
@@ -628,7 +658,7 @@ Make ESC qui prompts.
 
    ;; Bind "SPC h" to "C-h".
    "h" '(help-command :which-key "help")
-   "ht" '(load-theme :which-key "Load theme")
+   "ht" '(consult-theme :which-key "Load theme")
 
    "f" '(:ignore t :which-key "file")
    "ff" '(find-file :which-key "Find file")
