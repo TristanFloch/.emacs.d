@@ -388,7 +388,7 @@ Disable backup files
 
 * Vertico and consult
 
-Builtins emacs variables
+Builtins Emacs variables
 
 #+begin_src emacs-lisp
   (setq read-file-name-completion-ignore-case t
@@ -396,19 +396,31 @@ Builtins emacs variables
         completion-ignore-case t)
 #+end_src
 
-Helper function from https://systemcrafters.cc/live-streams/may-21-2021/
+Doom utilities
 
 #+begin_src emacs-lisp
-  (defun dw/minibuffer-backward-kill (arg)
-    "When minibuffer is completing a file name delete up to parent
-  folder, otherwise delete a character backward"
+  (defun vertico-directory-up (&optional n)
+    "Delete N directories before point."
     (interactive "p")
-    (if minibuffer-completing-file-name
-        ;; Borrowed from https://github.com/raxod502/selectrum/issues/498#issuecomment-803283608
-        (if (string-match-p "/." (minibuffer-contents))
-            (zap-up-to-char (- arg) ?/)
-          (delete-minibuffer-contents))
-        (delete-backward-char arg)))
+    (when (and (> (point) (minibuffer-prompt-end))
+               (eq (char-before) ?/)
+               (vertico-directory--completing-file-p))
+      (let ((path (buffer-substring (minibuffer-prompt-end) (point))) found)
+        (when (string-match-p "\\`~[^/]*/\\'" path)
+          (delete-minibuffer-contents)
+          (insert (expand-file-name path)))
+        (dotimes (_ n found)
+          (save-excursion
+            (goto-char (1- (point)))
+            (when (search-backward "/" (minibuffer-prompt-end) t)
+              (delete-region (1+ (point)) (point-max))
+              (setq found t)))))))
+
+  (defun vertico-directory-delete-char (&optional n)
+    "Delete N directories or chars before point."
+    (interactive "p")
+    (unless (vertico-directory-up n)
+      (backward-delete-char n)))
 #+end_src
 
 #+begin_src emacs-lisp
@@ -417,7 +429,7 @@ Helper function from https://systemcrafters.cc/live-streams/may-21-2021/
                 ("C-j" . vertico-next)
                 ("C-k" . vertico-previous)
                 :map minibuffer-local-map
-                ("<backspace>" . dw/minibuffer-backward-kill))
+                ("<backspace>" . vertico-directory-delete-char))
 
     :custom
     (vertico-cycle t)
@@ -480,7 +492,7 @@ Adds information for completions
     (marginalia-mode))
  #+end_src
 
-Ui and enhancements for vertico
+Front end for vertico
 
 #+begin_src emacs-lisp
   (use-package consult)
