@@ -335,6 +335,12 @@ Remove trailing whitespaces on save.
 (add-hook 'before-save-hook (lambda() (delete-trailing-whitespace)))
 #+end_src
 
+Save cursor position when editing a buffer
+
+#+begin_src emacs-lisp
+  (use-package saveplace
+    :hook (after-init . save-place-mode))
+#+end_src
 
 ** Files
 
