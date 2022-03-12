@@ -387,6 +387,7 @@ Disable backup files
 #+end_src
 
 * Vertico and consult
+** Utilities
 
 Builtins Emacs variables
 
@@ -422,20 +423,6 @@ Doom utilities
     (unless (vertico-directory-up n)
       (backward-delete-char n)))
 #+end_src
-
-#+begin_src emacs-lisp
-  (use-package vertico
-    :bind (:map vertico-map
-                ("C-j" . vertico-next)
-                ("C-k" . vertico-previous)
-                :map minibuffer-local-map
-                ("<backspace>" . vertico-directory-delete-char))
-
-    :custom
-    (vertico-cycle t)
-    :init
-    (vertico-mode))
-  #+end_src
 
 #+begin_src emacs-lisp
   ;; A few more useful configurations...
@@ -481,6 +468,22 @@ Builtin package to remember history for commands
     (savehist-mode))
 #+end_src
 
+** Vertico
+
+#+begin_src emacs-lisp
+  (use-package vertico
+    :bind (:map vertico-map
+                ("C-j" . vertico-next)
+                ("C-k" . vertico-previous)
+                :map minibuffer-local-map
+                ("<backspace>" . vertico-directory-delete-char))
+
+    :custom
+    (vertico-cycle t)
+    :init
+    (vertico-mode))
+  #+end_src
+
 Adds information for completions
 
 #+begin_src emacs-lisp
@@ -491,6 +494,16 @@ Adds information for completions
     :init
     (marginalia-mode))
  #+end_src
+
+Addon for icons in marginalia mode
+
+#+begin_src emacs-lisp
+  (use-package all-the-icons-completion
+    :hook
+    (add-hook 'marginalia-mode-hook #'all-the-icons-completion-marginalia-setup))
+#+end_src
+
+** Consult
 
 Front end for vertico
 
