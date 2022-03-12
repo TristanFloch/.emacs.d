@@ -43,19 +43,6 @@
 
 * Startup
 
-Taken from efs: https://github.com/daviwil/emacs-from-scratch/blob/master/show-notes/Emacs-Scratch-12.org
-
-#+begin_src emacs-lisp
-  (defun efs/display-startup-time ()
-    (message "Emacs loaded in %s with %d garbage collections."
-             (format "%.2f seconds"
-                     (float-time
-                     (time-subtract after-init-time before-init-time)))
-             gcs-done))
-
-  (add-hook 'emacs-startup-hook #'efs/display-startup-time)
-#+end_src
-
 Gcmh is the mode used by Doom to garbage collect only on idle time.
 It is important to do it at the beginning to speed up the startup time.
 
@@ -63,10 +50,6 @@ It is important to do it at the beginning to speed up the startup time.
   (use-package gcmh
     :config (gcmh-mode t))
 #+end_src
-
-** Doom improvments
-
-The following code and comments are copied from Doom Emacs.
 
 The GC introduces annoying pauses and stuttering into our Emacs experience,
 so we use `gcmh' to stave off the GC while we're using Emacs, and provoke it
@@ -97,8 +80,7 @@ Reduce *Message* noise at startup. An empty scratch buffer (or the dashboard)
 is more than enough.
 
 #+begin_src emacs-lisp
-  (setq inhibit-startup-screen t
-        inhibit-startup-echo-area-message user-login-name
+  (setq inhibit-startup-echo-area-message user-login-name
         ;; Shave seconds off startup time by starting the scratch buffer in
         ;; `fundamental-mode', rather than, say, `org-mode' or `text-mode', which
         ;; pull in a ton of packages.
@@ -198,30 +180,28 @@ It's best to avoid them altogether and have Emacs handle the prompting.
   (setq x-gtk-use-system-tooltips nil) ; Linux only
 #+end_src
 
-** TODO Dashboard
-
-#+begin_src emacs-lisp :tangle no
-(use-package page-break-lines) ; optional dependency
-(setq inhibit-startup-message t)
-(use-package dashboard
-  :init
-  (setq dashboard-set-heading-icons t)
-  (setq dashboard-set-file-icons t)
-  (setq dashboard-banner-logo-title "Emacs > All")
-  (setq dashboard-startup-banner 'official)
-  (setq dashboard-items '((recents . 5)
-                          (agenda . 5 )
-                          (bookmarks . 3)
-                          (projects . 3)))
-  :config
-  (dashboard-setup-startup-hook)
-  )
-#+end_src
-
-Ensures that =emacsclient= always opens on dashboard rather than scratch.
+** Dashboard
 
 #+begin_src emacs-lisp
- ;; (setq initial-buffer-choice (lambda () (get-buffer "*dashboard*")))
+  (use-package page-break-lines) ; optional dependency
+  (setq inhibit-startup-message t)
+
+  (use-package dashboard
+   :init
+   (setq dashboard-set-heading-icons t
+         dashboard-set-file-icons t
+         dashboard-banner-logo-title "Emacs > All"
+         dashboard-startup-banner 'official
+         dashboard-items '((recents . 5)
+                           (agenda . 5 )
+                           (bookmarks . 3)
+                           (projects . 3)))
+    (add-hook 'after-init-hook 'dashboard-refresh-buffer)
+    :config
+    (dashboard-setup-startup-hook)
+
+    ;; Ensures that `emacsclient' always opens on dashboard rather than scratch.
+    (setq initial-buffer-choice (lambda () (get-buffer "*dashboard*"))))
 #+end_src
 
 ** Theme
