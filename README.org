@@ -307,6 +307,7 @@ Helper function from https://systemcrafters.cc/live-streams/may-21-2021/
     ;;       #'command-completion-default-include-p)
 
     (setq enable-recursive-minibuffers t
+          completion-cycle-threshold 4 ; TAB cycle if there are only few candidates
           tab-always-indent 'complete))
 #+end_src
 
@@ -662,19 +663,19 @@ The keybinding needs to be added.
 #+end_src
 
 * Code completion
-** Corfu
 
-For plugin corfu to lsp-mode: https://github.com/minad/corfu/wiki
+- For plugin corfu to lsp-mode: https://github.com/minad/corfu/wiki
+- Improve completion with more packages: https://github.com/minad/corfu#complementary-packages
 
 #+begin_src emacs-lisp
   (use-package corfu
     :custom
     (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
     (corfu-auto t)                 ;; Enable auto completion
-    ;; (corfu-separator ?\s)          ;; Orderless field separator
+    (corfu-separator ?\s)          ;; Orderless field separator
     ;; (corfu-quit-at-boundary nil)   ;; Never quit at completion boundary
     ;; (corfu-quit-no-match nil)      ;; Never quit, even if there is no match
-    ;; (corfu-preview-current nil)    ;; Disable current candidate preview
+    (corfu-preview-current nil)    ;; Disable current candidate preview
     ;; (corfu-preselect-first nil)    ;; Disable candidate preselection
     ;; (corfu-on-exact-match nil)     ;; Configure handling of exact matches
     ;; (corfu-echo-documentation nil) ;; Disable documentation in the echo area
@@ -690,13 +691,12 @@ For plugin corfu to lsp-mode: https://github.com/minad/corfu/wiki
                 ([tab] . corfu-next)
                 ("S-TAB" . corfu-previous)
                 ([backtab] . corfu-previous))
+
     ;; Recommended: Enable Corfu globally.
     ;; This is recommended since dabbrev can be used globally (M-/).
     :init
     (corfu-global-mode))
 #+end_src
-
-Dabbrev, the default Emacs completion, can be configured more to improve corfu completion: https://github.com/minad/corfu#installation-and-configuration
 
 #+begin_src emacs-lisp
   (use-package cape
@@ -730,6 +730,17 @@ Dabbrev, the default Emacs completion, can be configured more to improve corfu c
     ;;(add-to-list 'completion-at-point-functions #'cape-symbol)
     ;;(add-to-list 'completion-at-point-functions #'cape-line)
   )
+#+end_src
+
+** Icons
+
+#+begin_src emacs-lisp
+  (use-package kind-icon
+    :after corfu
+    :custom
+    (kind-icon-default-face 'corfu-default) ; to compute blended backgrounds correctly
+    :config
+    (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
 #+end_src
 
 * Literate
