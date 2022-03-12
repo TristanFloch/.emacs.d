@@ -41,33 +41,161 @@
   (auto-package-update-at-time "09:00"))
 #+end_src
 
+* Startup
+
+Taken from efs: https://github.com/daviwil/emacs-from-scratch/blob/master/show-notes/Emacs-Scratch-12.org
+
+#+begin_src emacs-lisp
+  (defun efs/display-startup-time ()
+    (message "Emacs loaded in %s with %d garbage collections."
+             (format "%.2f seconds"
+                     (float-time
+                     (time-subtract after-init-time before-init-time)))
+             gcs-done))
+
+  (add-hook 'emacs-startup-hook #'efs/display-startup-time)
+#+end_src
+
+** Doom improvments
+
+The following code and comments are copied from Doom Emacs.
+
+The GC introduces annoying pauses and stuttering into our Emacs experience,
+so we use `gcmh' to stave off the GC while we're using Emacs, and provoke it
+when it's idle. However, if the idle delay is too long, we run the risk of
+runaway memory usage in busy sessions. If it's too low, then we may as well
+not be using gcmh at all.
+
+#+begin_src emacs-lisp
+(setq gcmh-idle-delay 'auto  ; default is 15s
+      gcmh-auto-idle-delay-factor 10
+      gcmh-high-cons-threshold (* 16 1024 1024))  ; 16mb
+#+end_src
+
+Emacs "updates" its ui more often than it needs to, so slow it down slightly.
+
+#+begin_src emacs-lisp
+(setq idle-update-delay 1.0)  ; default is 0.5
+#+end_src
+
+Remove command line options that aren't relevant to our current OS; means
+slightly less to process at startup.
+
+#+begin_src emacs-lisp
+(setq command-line-x-option-alist nil)
+#+end_src
+
+Reduce *Message* noise at startup. An empty scratch buffer (or the dashboard)
+is more than enough.
+
+#+begin_src emacs-lisp
+  (setq inhibit-startup-screen t
+        inhibit-startup-echo-area-message user-login-name
+        ;; Shave seconds off startup time by starting the scratch buffer in
+        ;; `fundamental-mode', rather than, say, `org-mode' or `text-mode', which
+        ;; pull in a ton of packages.
+        initial-major-mode 'fundamental-mode
+        initial-scratch-message nil)
+#+end_src
+
+** Early init
+:PROPERTIES:
+:header-args: :results silent :tangle "./early-init.el"
+:END:
+
+From Doom: a big contributor to startup times is garbage collection. We up the gc
+threshold to temporarily prevent it from running, then reset it later by
+enabling `gcmh-mode'. Not resetting it will cause stuttering/freezes.
+
+#+begin_src emacs-lisp
+(setq gc-cons-threshold most-positive-fixnum)
+#+end_src
+
+Make UTF-8 the default coding system.
+
+#+begin_src emacs-lisp
+(set-language-environment "UTF-8")
+#+end_src
+
+Set-language-enviornment sets default-input-method, which is unwanted.
+
+#+begin_src emacs-lisp
+(setq default-input-method nil)
+#+end_src
+
 * Appearance
 ** Icons
 
 #+begin_src emacs-lisp
-(use-package all-the-icons)
+  (use-package all-the-icons
+    :commands (all-the-icons-octicon
+               all-the-icons-faicon
+               all-the-icons-fileicon
+               all-the-icons-wicon
+               all-the-icons-material
+               all-the-icons-alltheicon))
 #+end_src
 
 ** Windows
 
+From Doom:
+I am intentionally not calling `menu-bar-mode', `tool-bar-mode', and
+`scroll-bar-mode' because they do extra and unnecessary work that can be more
+concisely and efficiently expressed with these six lines.
+And set these to nil so users don't have to toggle the modes twice to
+reactivate them.
+
 #+begin_src emacs-lisp
-  (menu-bar-mode -1)
-  (tool-bar-mode -1)
-  (tooltip-mode -1)
-  (scroll-bar-mode -1)
+  (push '(menu-bar-lines . 0)   default-frame-alist)
+  (push '(tool-bar-lines . 0)   default-frame-alist)
+  (push '(vertical-scroll-bars) default-frame-alist)
+
+  (setq menu-bar-mode nil
+        tool-bar-mode nil
+        scroll-bar-mode nil)
 #+end_src
 
 #+begin_src emacs-lisp
-(use-package switch-window)
+  (use-package switch-window
+    :defer t)
+#+end_src
+
+#+begin_src emacs-lisp
+  (setq frame-title-format '("Emacs – %b")
+        icon-title-format frame-title-format)
+#+end_src
+
+Don't resize the frames in steps; it looks weird, especially in tiling window
+managers, where it can leave unseemly gaps.
+
+#+begin_src emacs-lisp
+(setq frame-resize-pixelwise t)
+#+end_src
+
+But do not resize windows pixelwise, this can cause crashes in some cases
+when resizing too many windows at once or rapidly.
+
+#+begin_src emacs-lisp
+(setq window-resize-pixelwise nil)
+#+end_src
+
+GUIs are inconsistent across systems and themes (and will rarely match our
+active Emacs theme). They impose inconsistent shortcut key paradigms too.
+It's best to avoid them altogether and have Emacs handle the prompting.
+
+#+begin_src emacs-lisp
+  (setq use-dialog-box nil)
+  (when (bound-and-true-p tooltip-mode)
+    (tooltip-mode -1))
+  (setq x-gtk-use-system-tooltips nil) ; Linux only
 #+end_src
 
 ** TODO Dashboard
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle no
 (use-package page-break-lines) ; optional dependency
 (setq inhibit-startup-message t)
 (use-package dashboard
-  :ensure t
   :init
   (setq dashboard-set-heading-icons t)
   (setq dashboard-set-file-icons t)
@@ -142,6 +270,12 @@ Taken from NANO Emacs.
 
 ** Line and column numbers
 
+Explicitly define a width to reduce the cost of on-the-fly computation
+
+#+begin_src emacs-lisp
+(setq-default display-line-numbers-width 3)
+#+end_src
+
 #+begin_src emacs-lisp
   (column-number-mode)
   (global-display-line-numbers-mode t)
@@ -162,7 +296,10 @@ Prevent the display of line numbers for some modes:
 
 #+begin_src emacs-lisp
   (setq-default cursor-in-non-selected-windows nil)
-  (setq highlight-nonselected-windows nil)
+  (setq highlight-nonselected-windows nil
+        ;; Don't stretch the cursor to fit wide characters, it is disorienting,
+        ;; especially for tabs.
+        x-stretch-cursor nil)
   (blink-cursor-mode 0)
   (global-hl-line-mode)
 #+end_src
@@ -190,7 +327,7 @@ Prevent the display of line numbers for some modes:
 Ask "y" or "n" instead of "yes" or "no".
 
 #+begin_src emacs-lisp
-(fset 'yes-or-no-p 'y-or-n-p)
+(advice-add #'yes-or-no-p :override #'y-or-n-p)
 #+end_src
 
 Remove trailing whitespaces on save.
@@ -200,23 +337,6 @@ Remove trailing whitespaces on save.
 (add-hook 'before-save-hook (lambda() (delete-trailing-whitespace)))
 #+end_src
 
-
-** Early init
-:PROPERTIES:
-:header-args: :results silent :tangle "./early-init.el"
-:END:
-
-Make UTF-8 the default coding system.
-
-#+begin_src emacs-lisp
-(set-language-environment "UTF-8")
-#+end_src
-
-Set-language-enviornment sets default-input-method, which is unwanted.
-
-#+begin_src emacs-lisp
-(setq default-input-method nil)
-#+end_src
 
 ** Files
 
