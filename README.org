@@ -558,11 +558,16 @@ Make ESC qui prompts.
     :after evil
     :config
     (general-evil-setup t)
+
+    ;; Prevent "X starts with non-prefix key Y" errors except at startup.
+    (general-auto-unbind-keys)
+
     (general-create-definer tf/leader-keys
-      :keymaps '(normal visual emacs help-map)
+      :states '(normal visual motion emacs)
+      :major-modes t
+      :keymaps 'override
       :prefix "SPC"
-      :global-prefix "C-SPC")
-    )
+      :global-prefix "C-SPC"))
 #+end_src
 
 #+begin_src emacs-lisp
@@ -572,7 +577,6 @@ Make ESC qui prompts.
     "g c" #'evilnc-comment-or-uncomment-lines
     "g r" #'eval-region)
 #+end_src
-
 
 #+begin_src emacs-lisp
   (tf/leader-keys
