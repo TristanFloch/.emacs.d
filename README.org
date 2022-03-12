@@ -11,8 +11,8 @@
     (require 'package)
 
     (setq package-archives '(("melpa" . "https://melpa.org/packages/")
-			     ("org" . "https://orgmode.org/elpa/")
-			     ("elpa" . "https://elpa.gnu.org/packages/")))
+                             ("org" . "https://orgmode.org/elpa/")
+                             ("elpa" . "https://elpa.gnu.org/packages/")))
 
     (package-initialize)
 
@@ -48,13 +48,17 @@
 (use-package all-the-icons)
 #+end_src
 
-** Windows decorations off
+** Windows
 
 #+begin_src emacs-lisp
   (menu-bar-mode -1)
   (tool-bar-mode -1)
-  (tooltip-mode -1) 
+  (tooltip-mode -1)
   (scroll-bar-mode -1)
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package switch-window)
 #+end_src
 
 ** TODO Dashboard
@@ -103,18 +107,18 @@ Taken from NANO Emacs.
 
 #+begin_src emacs-lisp
   (set-face-attribute 'default nil
-		      :font "Roboto Mono" :height 130 :weight 'light)
+                      :font "Roboto Mono" :height 130 :weight 'light)
   (set-face-attribute 'bold nil
-		      :family "Roboto Mono" :weight 'regular)
+                      :family "Roboto Mono" :weight 'regular)
   (set-face-attribute 'italic nil
-		      :family "Victor Mono" :weight 'semilight :slant 'italic)
+                      :family "Victor Mono" :weight 'semilight :slant 'italic)
   (set-face-attribute 'variable-pitch nil
-		      :font "Roboto" :height 150 :weight 'light)
+                      :font "Roboto" :height 150 :weight 'light)
   (set-fontset-font t 'unicode
-		    (font-spec :name "Inconsolata Light" :size 14) nil)
+                    (font-spec :name "Inconsolata Light" :size 14) nil)
 
   ;; (set-fontset-font t '(#xe000 . #xffdd)
-  ;; 		  (font-spec :name "RobotoMono Nerd Font" :size 12) nil)
+  ;;              (font-spec :name "RobotoMono Nerd Font" :size 12) nil)
 
   (setq global-prettify-symbols-mode t)
 #+end_src
@@ -147,10 +151,10 @@ Prevent the display of line numbers for some modes:
 
 #+begin_src emacs-lisp
   (dolist (mode '(term-mode-hook
-		  eshell-mode-hook
-		  treemacs-mode-hook
-		  dired-mode-hook
-		  calendar-mode-hook))
+                  eshell-mode-hook
+                  treemacs-mode-hook
+                  dired-mode-hook
+                  calendar-mode-hook))
     (add-hook mode (lambda () (display-line-numbers-mode 0))))
 #+end_src
 
@@ -170,17 +174,32 @@ Prevent the display of line numbers for some modes:
     :diminish which-key-mode
     :init
     (setq which-key-sort-order #'which-key-key-order-alpha
-	  which-key-sort-uppercase-first nil
-	  which-key-add-column-padding 1
-	  which-key-max-display-columns nil
-	  which-key-min-display-lines 6
-	  which-key-side-window-slot -10
-	  which-key-separator " → ")
+          which-key-sort-uppercase-first nil
+          which-key-add-column-padding 1
+          which-key-max-display-columns nil
+          which-key-min-display-lines 6
+          which-key-side-window-slot -10
+          which-key-separator " → ")
 
     (which-key-mode))
 #+end_src
 
-* Files
+* Misc
+
+Ask "y" or "n" instead of "yes" or "no".
+
+#+begin_src emacs-lisp
+(fset 'yes-or-no-p 'y-or-n-p)
+#+end_src
+
+Remove trailing whitespaces on save.
+
+#+begin_src emacs-lisp
+(add-hook 'before-save-hook 'whitespace-cleanup)
+(add-hook 'before-save-hook (lambda() (delete-trailing-whitespace)))
+#+end_src
+
+** Files
 
 #+begin_src emacs-lisp
   (recentf-mode 1)
@@ -188,28 +207,35 @@ Prevent the display of line numbers for some modes:
   (setq recentf-max-saved-items 25)
 #+end_src
 
+Disable backup files
+
+#+begin_src emacs-lisp
+  (setq make-backup-files nil
+        backup-inhibited t
+        auto-save-default nil)
+#+end_src
+
 * Dired
 
 #+begin_src emacs-lisp
   (use-package dired
     :ensure nil
+    :commands (dired dired-jump)
     :init
     (setq dired-dwim-target t  ; suggest a target for moving/copying intelligently
-	  dired-hide-details-hide-symlink-targets nil
+          dired-hide-details-hide-symlink-targets nil
 
-	  ;; Always copy/delete recursively
-	  dired-recursive-copies  'always
-	  dired-recursive-deletes 'top
-	  ;; Ask whether destination dirs should get created when copying/removing files.
-	  dired-create-destination-dirs 'always)
-      )
+          ;; Always copy/delete recursively
+          dired-recursive-copies  'always
+          dired-recursive-deletes 'top
+          ;; Ask whether destination dirs should get created when copying/removing files.
+          dired-create-destination-dirs 'always))
 
 
   (use-package all-the-icons-dired
     :hook (dired-mode . all-the-icons-dired-mode)
     :config
-    (setq all-the-icons-dired-monochrome nil)
-    )
+    (setq all-the-icons-dired-monochrome nil))
 #+end_src
 
 #+begin_src emacs-lisp
@@ -227,8 +253,8 @@ Builtins emacs variables
 
 #+begin_src emacs-lisp
   (setq read-file-name-completion-ignore-case t
-	read-buffer-completion-ignore-case t
-	completion-ignore-case t)
+        read-buffer-completion-ignore-case t
+        completion-ignore-case t)
 #+end_src
 
 Helper function from https://systemcrafters.cc/live-streams/may-21-2021/
@@ -239,20 +265,20 @@ Helper function from https://systemcrafters.cc/live-streams/may-21-2021/
   folder, otherwise delete a character backward"
     (interactive "p")
     (if minibuffer-completing-file-name
-	;; Borrowed from https://github.com/raxod502/selectrum/issues/498#issuecomment-803283608
-	(if (string-match-p "/." (minibuffer-contents))
-	    (zap-up-to-char (- arg) ?/)
-	  (delete-minibuffer-contents))
-	(delete-backward-char arg)))
+        ;; Borrowed from https://github.com/raxod502/selectrum/issues/498#issuecomment-803283608
+        (if (string-match-p "/." (minibuffer-contents))
+            (zap-up-to-char (- arg) ?/)
+          (delete-minibuffer-contents))
+        (delete-backward-char arg)))
 #+end_src
 
 #+begin_src emacs-lisp
   (use-package vertico
     :bind (:map vertico-map
-		("C-j" . vertico-next)
-		("C-k" . vertico-previous)
-		:map minibuffer-local-map
-		("<backspace>" . dw/minibuffer-backward-kill))
+                ("C-j" . vertico-next)
+                ("C-k" . vertico-previous)
+                :map minibuffer-local-map
+                ("<backspace>" . dw/minibuffer-backward-kill))
 
     :custom
     (vertico-cycle t)
@@ -261,31 +287,31 @@ Helper function from https://systemcrafters.cc/live-streams/may-21-2021/
   #+end_src
 
 #+begin_src emacs-lisp
-;; A few more useful configurations...
-(use-package emacs
-  :init
-  ;; Add prompt indicator to `completing-read-multiple'.
-  ;; Alternatively try `consult-completing-read-multiple'.
-  (defun crm-indicator (args)
-    (cons (concat "[CRM] " (car args)) (cdr args)))
-  (advice-add #'completing-read-multiple :filter-args #'crm-indicator)
+  ;; A few more useful configurations...
+  (use-package emacs
+    :init
+    ;; Add prompt indicator to `completing-read-multiple'.
+    ;; Alternatively try `consult-completing-read-multiple'.
+    (defun crm-indicator (args)
+      (cons (concat "[CRM] " (car args)) (cdr args)))
+    (advice-add #'completing-read-multiple :filter-args #'crm-indicator)
 
-  ;; Do not allow the cursor in the minibuffer prompt
-  (setq minibuffer-prompt-properties
-        '(read-only t cursor-intangible t face minibuffer-prompt))
-  (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
+    ;; Do not allow the cursor in the minibuffer prompt
+    (setq minibuffer-prompt-properties
+          '(read-only t cursor-intangible t face minibuffer-prompt))
+    (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
 
-  ;; Emacs 28: Hide commands in M-x which do not work in the current mode.
-  ;; Vertico commands are hidden in normal buffers.
-  ;; (setq read-extended-command-predicate
-  ;;       #'command-completion-default-include-p)
+    ;; Emacs 28: Hide commands in M-x which do not work in the current mode.
+    ;; Vertico commands are hidden in normal buffers.
+    ;; (setq read-extended-command-predicate
+    ;;       #'command-completion-default-include-p)
 
-  ;; Enable recursive minibuffers
-  (setq enable-recursive-minibuffers t))
+    (setq enable-recursive-minibuffers t
+          tab-always-indent 'complete))
 #+end_src
-  
+
 Fuzzy search completion
-  
+
 #+begin_src emacs-lisp
   (use-package orderless
     :custom (completion-styles '(orderless)))
@@ -316,6 +342,7 @@ Ui and enhancements for vertico
 #+begin_src emacs-lisp
   (use-package consult)
 #+end_src
+
 * Key bindings
 ** Better escape
 
@@ -330,11 +357,11 @@ Make ESC qui prompts.
   (use-package evil
     :init
     (setq evil-want-integration t
-	  evil-want-keybinding nil
-	  evil-vsplit-window-right t
-	  evil-split-window-below t
-	  evil-want-C-u-scroll t
-	  evil-undo-system 'undo-redo)
+          evil-want-keybinding nil
+          evil-vsplit-window-right t
+          evil-split-window-below t
+          evil-want-C-u-scroll t
+          evil-undo-system 'undo-redo)
     :config
     (evil-mode 1)
 
