@@ -376,11 +376,19 @@ Disable backup files
           ;; Ask whether destination dirs should get created when copying/removing files.
           dired-create-destination-dirs 'always))
 
+#+end_src
 
+Icons and colors
+
+#+begin_src emacs-lisp
   (use-package all-the-icons-dired
     :hook (dired-mode . all-the-icons-dired-mode)
     :config
     (setq all-the-icons-dired-monochrome nil))
+
+  (use-package diredfl
+    :hook (dired-mode . diredfl-mode))
+
 #+end_src
 
 #+begin_src emacs-lisp
