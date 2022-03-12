@@ -12,3 +12,5 @@
 /custom.el
 /init.el
 /.cache/
+/early-init.el
+/forge-database.sqlite

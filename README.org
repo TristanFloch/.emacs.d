@@ -199,6 +199,24 @@ Remove trailing whitespaces on save.
 (add-hook 'before-save-hook (lambda() (delete-trailing-whitespace)))
 #+end_src
 
+
+** Early init
+:PROPERTIES:
+:header-args: :results silent :tangle "./early-init.el"
+:END:
+
+Make UTF-8 the default coding system.
+
+#+begin_src emacs-lisp
+(set-language-environment "UTF-8")
+#+end_src
+
+Set-language-enviornment sets default-input-method, which is unwanted.
+
+#+begin_src emacs-lisp
+(setq default-input-method nil)
+#+end_src
+
 ** Files
 
 #+begin_src emacs-lisp
