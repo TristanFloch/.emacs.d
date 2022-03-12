@@ -451,7 +451,7 @@ Make ESC qui prompts.
    "q" '(:ignore t :which-key "quit")
    "qq" '(save-buffers-kill-terminal :which-key "Save and quit Emacs")
    "qr" '(:ignore t :which-key "reload")
-   "qrR" '((lambda () (interactive) (load-file "~/.emacs.d.gnu/init.el")) :which-key "Reload config only")
+   "qrR" '(tf/reload-config :which-key "Reload Emacs config")
    )
 #+end_src
 
@@ -463,8 +463,18 @@ Make ESC qui prompts.
    :wk-full-keys nil
    ;; make a prefix-command and add description
    "r" '(:prefix-command tf/reload-prefix-map :which-key "reload")
-   "rr" '((lambda () (interactive) (load-file "~/.emacs.d.gnu/init.el")) :which-key "Reload Emacs config")
+   "rr" '(tf/reload-config :which-key "Reload Emacs config")
    )
+#+end_src
+
+#+begin_src emacs-lisp
+  (defconst tf/config-file
+    (expand-file-name (concat user-emacs-directory "init.el")))
+
+  (defun tf/reload-config ()
+      "Loads user init.el file"
+      (interactive)
+    (load-file tf/config-file))
 #+end_src
 
 ** Hydra
