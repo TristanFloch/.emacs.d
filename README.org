@@ -56,6 +56,14 @@ Taken from efs: https://github.com/daviwil/emacs-from-scratch/blob/master/show-n
   (add-hook 'emacs-startup-hook #'efs/display-startup-time)
 #+end_src
 
+Gcmh is the mode used by Doom to garbage collect only on idle time.
+It is important to do it at the beginning to speed up the startup time.
+
+#+begin_src emacs-lisp
+  (use-package gcmh
+    :config (gcmh-mode t))
+#+end_src
+
 ** Doom improvments
 
 The following code and comments are copied from Doom Emacs.
