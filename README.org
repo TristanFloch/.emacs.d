@@ -766,20 +766,48 @@ Make ESC qui prompts.
 #+end_src
 
 * Org mode
-** Variables
+** Misc
 
 #+begin_src emacs-lisp
+(use-package org
+  :ensure nil
+  :defer t
+  :hook (org-mode . org-indent-mode)
+  :custom-face
+  ;; (org-block ((t (:inherit fixed-pitch))))
+  ;; (org-code ((t (:inherit (shadow fixed-pitch)))))
+  :config
   (setq org-ellipsis " ▼"
+        org-enforce-todo-dependencies t
+        org-eldoc-breadcrumb-separator " → "
+        org-fontify-done-headline t
+        org-fontify-quote-and-verse-blocks t
+        org-fontify-whole-heading-line t
+        org-hide-leading-stars t
+        org-imenu-depth 6
 
-        org-confirm-babel-evaluate nil
+        org-return-follows-link t
+        org-mouse-1-follows-link t
+
         org-edit-src-code-indentation 0
         org-src-fontify-natively t
         org-src-tab-acts-natively t
+        org-src-preserve-indentation t
+        org-confirm-babel-evaluate nil
+        org-link-elisp-confirm-function nil))
 
-        org-return-follows-link t
-        org-mouse-1-follows-link t)
 
-  (add-hook 'org-mode-hook 'org-indent-mode)
+;; FIXME
+
+;; (defvar org-src-mode-map
+;;   (let ((map (make-sparse-keymap)))
+;;     (define-key map "\C-c'" 'org-edit-src-exit)
+;;     (define-key map "\C-c\C-k" 'org-edit-src-abort)
+;;     (define-key map "\C-x\C-s" 'org-edit-src-save)
+;;     map))
+
+;; (add-hook 'org-load-hook
+;;           (define-key org-src-mode-map (kbd "C-c C-c") #'org-edit-src-exit))
 #+end_src
 
 ** Workflow
@@ -953,7 +981,7 @@ Most of those come from Doom.
              :prepend t)))
 #+end_src
 
-** Modes
+** Packages
 
 #+begin_src emacs-lisp
   (use-package org-bullets
