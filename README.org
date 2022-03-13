@@ -227,24 +227,24 @@ This is just for consistency inside the session as those are disabled in early-i
 
 ** Fonts
 
-Taken from NANO Emacs.
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
+incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis
+nostrud exercitation ullamco *laboris* nisi ut aliquip ex ea commodo consequat.
+Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore
+eu fugiat nulla pariatur. /Excepteur/ sint occaecat cupidatat non proident, sunt
+in culpa qui officia deserunt mollit anim id est laborum.
 
 #+begin_src emacs-lisp
-  (set-face-attribute 'default nil
-                      :font "Roboto Mono" :height 130 :weight 'light)
-  (set-face-attribute 'bold nil
-                      :family "Roboto Mono" :weight 'regular)
-  (set-face-attribute 'italic nil
-                      :family "Victor Mono" :weight 'semilight :slant 'italic)
-  (set-face-attribute 'variable-pitch nil
-                      :font "Roboto" :height 150 :weight 'light)
-  (set-fontset-font t 'unicode
-                    (font-spec :name "Inconsolata Light" :size 14) nil)
+(set-face-attribute 'default nil
+                    :font "Source Code Pro" :height 130 :weight 'medium)
 
-  ;; (set-fontset-font t '(#xe000 . #xffdd)
-  ;;              (font-spec :name "RobotoMono Nerd Font" :size 12) nil)
+(set-face-attribute 'italic nil
+                    :family "Victor Mono" :weight 'regular :slant 'italic)
 
-  (setq global-prettify-symbols-mode t)
+(set-face-attribute 'variable-pitch nil
+                    :font "Ubuntu Nerd Font" :height 150 :weight 'light)
+
+(set-face-attribute 'fixed-pitch nil :inherit 'default)
 #+end_src
 
 *** Zooming in and out
