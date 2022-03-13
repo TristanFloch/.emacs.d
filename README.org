@@ -765,34 +765,200 @@ Make ESC qui prompts.
  "ts" '(hydra-text-scale/body :which-key "Scale text"))
 #+end_src
 
-* Org mode config
-** General variables
+* Org mode
+** Variables
 
 #+begin_src emacs-lisp
-  (setq
-   org-directory "~/Documents/orgfiles/"
-   org-ellipsis " ▼"
-   org-src-fontify-natively t
-   org-src-tab-acts-natively t
-   org-confirm-babel-evaluate nil
-   org-edit-src-code-indentation 0
-   org-blank-before-new-entry (quote ((heading . nil)
-                                      (plain-list-item . nil)))
-   )
+  (setq org-ellipsis " ▼"
+
+        org-confirm-babel-evaluate nil
+        org-edit-src-code-indentation 0
+        org-src-fontify-natively t
+        org-src-tab-acts-natively t
+
+        org-return-follows-link t
+        org-mouse-1-follows-link t)
 
   (add-hook 'org-mode-hook 'org-indent-mode)
 #+end_src
 
-** Bullets
+** Workflow
+
+#+begin_src emacs-lisp
+  (setq org-directory "~/Documents/orgfiles/")
+#+end_src
+
+Most of those come from Doom.
+
+*** Utils
+
+#+begin_src emacs-lisp
+    (with-no-warnings
+      (custom-declare-face '+org-todo-active
+                           '((t (:inherit (bold font-lock-constant-face org-todo)))) "")
+      (custom-declare-face '+org-todo-project
+                           '((t (:inherit (bold font-lock-doc-face org-todo)))) "")
+      (custom-declare-face '+org-todo-onhold
+                           '((t (:inherit (bold warning org-todo)))) "")
+      (custom-declare-face '+org-todo-cancel
+                           '((t (:inherit (bold error org-todo)))) ""))
+#+end_src
+
+#+begin_src emacs-lisp
+    (defun +org--capture-local-root (path)
+      (let ((filename (file-name-nondirectory path)))
+        (expand-file-name
+         filename
+         (or (locate-dominating-file (file-truename default-directory)
+                                     filename)
+             (projectile-project-root)
+             (user-error "Couldn't detect a project")))))
+
+    (defun +org-capture-project-todo-file ()
+      "Find the nearest `+org-capture-todo-file' in a parent directory, otherwise,
+    opens a blank one at the project root. Throws an error if not in a project."
+      (+org--capture-local-root "todo.org"))
+
+    ;;;###autoload
+    (defun +org-capture-project-notes-file ()
+      "Find the nearest `+org-capture-notes-file' in a parent directory, otherwise,
+    opens a blank one at the project root. Throws an error if not in a project."
+      (+org--capture-local-root "project.org"))
+
+    ;;;###autoload
+    (defun +org-capture-project-changelog-file ()
+      "Find the nearest `+org-capture-changelog-file' in a parent directory,
+    otherwise, opens a blank one at the project root. Throws an error if not in a
+    project."
+      (+org--capture-local-root "changelog.org"))
+
+    (defun +org--capture-ensure-heading (headings &optional initial-level)
+      (if (not headings)
+          (widen)
+        (let ((initial-level (or initial-level 1)))
+          (if (and (re-search-forward (format org-complex-heading-regexp-format
+                                              (regexp-quote (car headings)))
+                                      nil t)
+                   (= (org-current-level) initial-level))
+              (progn
+                (beginning-of-line)
+                (org-narrow-to-subtree))
+            (goto-char (point-max))
+            (unless (and (bolp) (eolp)) (insert "\n"))
+            (insert (make-string initial-level ?*)
+                    " " (car headings) "\n")
+            (beginning-of-line 0))
+          (+org--capture-ensure-heading (cdr headings) (1+ initial-level)))))
+
+    (defun +org--capture-central-file (file project)
+      (let ((file (expand-file-name file org-directory)))
+        (set-buffer (org-capture-target-buffer file))
+        (org-capture-put-target-region-and-position)
+        (widen)
+        (goto-char (point-min))
+        ;; Find or create the project headling
+        (+org--capture-ensure-heading
+         (append (org-capture-get :parents)
+                 (list project (org-capture-get :heading))))))
+
+    (defun +org-capture-central-project-file ()
+      "TODO"
+      (+org--capture-central-file
+       "projects.org" (projectile-project-name)))
+#+end_src
+
+*** Actual
+
+#+begin_src emacs-lisp
+  (setq org-todo-keywords
+        '((sequence
+             "TODO(t)"  ; A task that needs doing & is ready to do
+             "PROJ(p)"  ; A project, which usually contains other tasks
+             "LOOP(r)"  ; A recurring task
+             "STRT(s)"  ; A task that is in progress
+             "WAIT(w)"  ; Something external is holding up this task
+             "HOLD(h)"  ; This task is paused/on hold because of me
+             "IDEA(i)"  ; An unconfirmed and unapproved task or notion
+             "|"
+             "DONE(d)"  ; Task successfully completed
+             "KILL(k)") ; Task was cancelled, aborted or is no longer applicable
+            (sequence
+             "[ ](T)"   ; A task that needs doing
+             "[-](S)"   ; Task is in progress
+             "[?](W)"   ; Task is being held up or paused
+             "|"
+             "[X](D)")  ; Task was completed
+            (sequence
+             "|"
+             "OKAY(o)"
+             "YES(y)"
+             "NO(n)"))
+        org-todo-keyword-faces '(("[-]"  . +org-todo-active)
+                                 ("STRT" . +org-todo-active)
+                                 ("[?]"  . +org-todo-onhold)
+                                 ("WAIT" . +org-todo-onhold)
+                                 ("HOLD" . +org-todo-onhold)
+                                 ("PROJ" . +org-todo-project)
+                                 ("NO"   . +org-todo-cancel)
+                                 ("KILL" . +org-todo-cancel)))
+
+#+end_src
+
+#+begin_src emacs-lisp
+  (setq org-capture-templates
+          '(("t" "Personal todo" entry (file+headline "todo.org" "Inbox")
+             "* TODO %?\n%i\n%a" :prepend t)
+            ("n" "Personal notes" entry (file+headline "notes.org" "Inbox")
+             "* %u %?\n%i\n%a" :prepend t)
+            ("j" "Journal" entry (file+olp+datetree "journal.org")
+             "* %U %?\n%i\n%a" :prepend t)
+            ("b" "Book" entry (file+headline "books.org" "Books")
+             "* %^{Author} - %^{Title} %^g\n" :prepend t)
+            ("l" "Link" entry (file+headline "links.org" "Links")
+             "* %x %^g\n" :immediate-finish t :prepend t)
+
+            ;; TODO
+            ;; Will use {project-root}/{todo,notes,changelog}.org, unless a
+            ;; {todo,notes,changelog}.org file is found in a parent directory.
+            ("p" "Templates for projects")
+            ("pt" "Project-local todo" entry  ; {project-root}/todo.org
+             (file+headline +org-capture-project-todo-file "Inbox")
+             "* TODO %?\n%i\n%a" :prepend t)
+            ("pn" "Project-local notes" entry  ; {project-root}/notes.org
+             (file+headline +org-capture-project-notes-file "Inbox")
+             "* %U %?\n%i\n%a" :prepend t)
+            ("pc" "Project-local changelog" entry  ; {project-root}/changelog.org
+             (file+headline +org-capture-project-changelog-file "Unreleased")
+             "* %U %?\n%i\n%a" :prepend t)
+
+            ;; Will use {org-directory}/{+org-capture-projects-file} and store
+            ;; these under {ProjectName}/{Tasks,Notes,Changelog} headings. They
+            ;; support `:parents' to specify what headings to put them under, e.g.
+            ;; :parents ("Projects")
+            ("o" "Centralized templates for projects")
+            ("ot" "Project todo" entry
+             (function +org-capture-central-project-file)
+             "* TODO %?\n %i\n %a"
+             :heading "Tasks"
+             :prepend nil)
+            ("on" "Project notes" entry
+             (function +org-capture-central-project-file)
+             "* %U %?\n %i\n %a"
+             :heading "Notes"
+             :prepend t)
+            ("oc" "Project changelog" entry
+             (function +org-capture-central-project-file)
+             "* %U %?\n %i\n %a"
+             :heading "Changelog"
+             :prepend t)))
+#+end_src
+
+** Modes
 
 #+begin_src emacs-lisp
   (use-package org-bullets
     :hook (org-mode . org-bullets-mode))
 #+end_src
-
-** Source block
-
-Allows for =<s= followed by TAB to expand to a begin_src tag.  Other expansions available include:
 
 | Typing the below + TAB | Expands to             |
 |------------------------+------------------------|
@@ -808,20 +974,18 @@ Allows for =<s= followed by TAB to expand to a begin_src tag.  Other expansions 
 | <v                     | =#+BEGIN_VERSE=        |
 
 #+begin_src emacs-lisp
-(use-package org-tempo
-  :ensure nil)
+  (use-package org-tempo
+    :ensure nil ; builtin
+    :after org)
 #+end_src
-
-** Table of contents
 
 #+begin_src emacs-lisp
   (use-package toc-org
     :commands toc-org-enable
-    :init (add-hook 'org-mode-hook 'toc-org-enable)
-    )
+    :init (add-hook 'org-mode-hook 'toc-org-enable))
 #+end_src
 
-** Keymaps
+** =org-cycle= improvments
 
 Taken from Doom Emacs
 
