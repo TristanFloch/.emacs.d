@@ -839,13 +839,22 @@ All my (performant) foldings needs are met between this and `org-show-subtree'
     :hook (prog-mode . rainbow-delimiters-mode))
 #+end_src
 
-* Projectile
+* Projects
 
 #+begin_src emacs-lisp
   (use-package projectile
-    :config (projectile-mode)
-    :custom ((projectile-completion-system 'auto))
-    )
+    :commands (projectile-project-root
+               projectile-project-name
+               projectile-project-p
+               projectile-locate-dominating-file
+               projectile-relevant-known-projects)
+    :init
+    (setq projectile-ignored-projects '("~/"))
+
+    (global-set-key [remap evil-jump-to-tag] #'projectile-find-tag)
+    (global-set-key [remap find-tag]         #'projectile-find-tag)
+
+    :config (projectile-mode))
 #+end_src
 
 #+begin_src emacs-lisp
