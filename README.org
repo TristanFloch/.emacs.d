@@ -333,10 +333,16 @@ Prevent the display of line numbers for some modes:
 
 * Misc
 
-Ask "y" or "n" instead of "yes" or "no".
+Ask "y" or "n" instead of "yes" or "no"
 
 #+begin_src emacs-lisp
 (advice-add #'yes-or-no-p :override #'y-or-n-p)
+#+end_src
+
+Refresh buffer if changed on disk
+
+#+begin_src emacs-lisp
+(global-auto-revert-mode 1)
 #+end_src
 
 Save cursor position when editing a buffer
