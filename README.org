@@ -886,18 +886,33 @@ The keybinding needs to be added.
   ([remap describe-key] . helpful-key))
 #+end_src
 
-* Magit
+* Git
 
 #+begin_src emacs-lisp
   (use-package magit
-    :commands magit-status)
+    :commands magit-status
+    :config
+    (setq magit-save-repository-buffers nil)
 
+    ;; start git-commit-mode in insert mode if the commit message is empty
+    (add-hook 'git-commit-setup-hook
+              (lambda () (when (and (bound-and-true-p evil-mode)
+                                    (not (evil-emacs-state-p))
+                                    (bobp) (eolp))
+                           (evil-insert-state)))))
+
+  (use-package magit-todos
+    :after magit
+    :config
+    ;; taken from Doom
+    (setq magit-todos-keyword-suffix "\\(?:([^)]+)\\)?:?") ; make colon optional
+    (define-key magit-todos-section-map "j" nil))
+#+end_src
+
+#+begin_src emacs-lisp
   (tf/leader-keys
     "g" '(:ignore t :which-key "git")
     "g g" '(magit-status :which-key "Magit status"))
-
-  (use-package forge
-    :after magit)
 #+end_src
 
 * Code completion
