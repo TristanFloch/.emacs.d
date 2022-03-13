@@ -42,6 +42,7 @@
 #+end_src
 
 * Startup
+** Optimization
 
 Gcmh is the mode used by Doom to garbage collect only on idle time.
 It is important to do it at the beginning to speed up the startup time.
@@ -69,7 +70,7 @@ Emacs "updates" its ui more often than it needs to, so slow it down slightly.
 (setq idle-update-delay 1.0)  ; default is 0.5
 #+end_src
 
-Remove command line options that aren't relevant to our current OS; means
+Remove command line options that aren't relevant to the current OS; means
 slightly less to process at startup.
 
 #+begin_src emacs-lisp
@@ -93,6 +94,8 @@ is more than enough.
 :header-args: :results silent :tangle "./early-init.el"
 :END:
 
+This section is tangled to early-init.el
+
 From Doom: a big contributor to startup times is garbage collection. We up the gc
 threshold to temporarily prevent it from running, then reset it later by
 enabling `gcmh-mode'. Not resetting it will cause stuttering/freezes.
@@ -113,6 +116,18 @@ Set-language-enviornment sets default-input-method, which is unwanted.
 (setq default-input-method nil)
 #+end_src
 
+#+begin_src emacs-lisp
+(when (featurep 'native-compile)
+  (setq native-comp-async-report-warnings-errors nil)
+  (setq native-comp-deferred-compilation t))
+#+end_src
+
+#+begin_src emacs-lisp
+  (push '(menu-bar-lines . 0)   default-frame-alist)
+  (push '(tool-bar-lines . 0)   default-frame-alist)
+  (push '(vertical-scroll-bars) default-frame-alist)
+#+end_src
+
 * Appearance
 ** Icons
 
@@ -127,23 +142,6 @@ Set-language-enviornment sets default-input-method, which is unwanted.
 #+end_src
 
 ** Windows
-
-From Doom:
-I am intentionally not calling `menu-bar-mode', `tool-bar-mode', and
-`scroll-bar-mode' because they do extra and unnecessary work that can be more
-concisely and efficiently expressed with these six lines.
-And set these to nil so users don't have to toggle the modes twice to
-reactivate them.
-
-#+begin_src emacs-lisp
-  (push '(menu-bar-lines . 0)   default-frame-alist)
-  (push '(tool-bar-lines . 0)   default-frame-alist)
-  (push '(vertical-scroll-bars) default-frame-alist)
-
-  (setq menu-bar-mode nil
-        tool-bar-mode nil
-        scroll-bar-mode nil)
-#+end_src
 
 #+begin_src emacs-lisp
   (use-package switch-window
@@ -169,7 +167,7 @@ when resizing too many windows at once or rapidly.
 (setq window-resize-pixelwise nil)
 #+end_src
 
-GUIs are inconsistent across systems and themes (and will rarely match our
+GUIs are inconsistent across systems and themes (and will rarely match the
 active Emacs theme). They impose inconsistent shortcut key paradigms too.
 It's best to avoid them altogether and have Emacs handle the prompting.
 
@@ -178,6 +176,14 @@ It's best to avoid them altogether and have Emacs handle the prompting.
   (when (bound-and-true-p tooltip-mode)
     (tooltip-mode -1))
   (setq x-gtk-use-system-tooltips nil) ; Linux only
+#+end_src
+
+This is just for consistency inside the session as those are disabled in early-init.
+
+#+begin_src emacs-lisp
+  (setq menu-bar-mode nil
+        tool-bar-mode nil
+        scroll-bar-mode nil)
 #+end_src
 
 ** Dashboard
@@ -333,13 +339,6 @@ Ask "y" or "n" instead of "yes" or "no".
 (advice-add #'yes-or-no-p :override #'y-or-n-p)
 #+end_src
 
-Remove trailing whitespaces on save.
-
-#+begin_src emacs-lisp
-(add-hook 'before-save-hook 'whitespace-cleanup)
-(add-hook 'before-save-hook (lambda() (delete-trailing-whitespace)))
-#+end_src
-
 Save cursor position when editing a buffer
 
 #+begin_src emacs-lisp
@@ -347,10 +346,10 @@ Save cursor position when editing a buffer
     :hook (after-init . save-place-mode))
 #+end_src
 
-** Files
+Enable builtin recentf mode
 
 #+begin_src emacs-lisp
-  (recentf-mode 1)
+  (add-hook 'after-init-hook #'recentf-mode)
   (setq recentf-max-menu-items 25)
   (setq recentf-max-saved-items 25)
 #+end_src
@@ -479,10 +478,7 @@ Fuzzy search completion
 Builtin package to remember history for commands
 
 #+begin_src emacs-lisp
-  (use-package savehist
-    :ensure nil
-    :init
-    (savehist-mode))
+(savehist-mode 1)
 #+end_src
 
 ** Vertico
@@ -832,6 +828,21 @@ All my (performant) foldings needs are met between this and `org-show-subtree'
 #+end_src
 
 * Prog mode
+** Programing preferences
+
+Remove trailing whitespaces on save.
+
+#+begin_src emacs-lisp
+(add-hook 'before-save-hook 'whitespace-cleanup)
+(add-hook 'before-save-hook (lambda() (delete-trailing-whitespace)))
+#+end_src
+
+Spaces instead of tabs
+
+#+begin_src emacs-lisp
+  (setq-default indent-tabs-mode nil)
+#+end_src
+
 ** Rainbow delimiters
 
 #+begin_src emacs-lisp
