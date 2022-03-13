@@ -362,6 +362,14 @@ Disable backup files
         auto-save-default nil)
 #+end_src
 
+Improvments for long files and files with long lines
+
+#+begin_src emacs-lisp
+  (setq-default bidi-paragraph-direction 'left-to-right)
+  (setq-default bidi-inhibit-bpa t)
+  (global-so-long-mode 1)
+#+end_src
+
 Scrolling improvments
 
 #+begin_src emacs-lisp
