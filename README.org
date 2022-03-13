@@ -313,6 +313,20 @@ Prevent the display of line numbers for some modes:
     (evil-goggles-mode))
 #+end_src
 
+#+begin_src emacs-lisp
+(use-package rainbow-mode
+  :commands rainbow-mode)
+#+end_src
+
+** Bar
+
+#+begin_src emacs-lisp
+(use-package nyan-mode
+  :hook (after-init . nyan-mode)
+  :config
+  (setq nyan-animate-nyancat t))
+#+end_src
+
 * Which Key
 
 #+begin_src emacs-lisp
