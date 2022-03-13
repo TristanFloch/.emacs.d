@@ -1097,6 +1097,14 @@ Spaces instead of tabs
     :hook (prog-mode . rainbow-delimiters-mode))
 #+end_src
 
+* Languages
+** Nix
+
+#+begin_src emacs-lisp
+(use-package nix-mode
+  :mode "\\.nix\\'")
+#+end_src
+
 * Projects
 
 #+begin_src emacs-lisp
