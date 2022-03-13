@@ -294,13 +294,16 @@ Prevent the display of line numbers for some modes:
   (global-hl-line-mode)
 #+end_src
 
-** Goggles
+** Visual effects
 
 #+begin_src emacs-lisp
   (use-package evil-goggles
     :after evil
     :config
-    (setq evil-goggles-duration 0.120)
+    (setq evil-goggles-duration 0.1
+          evil-goggles-pulse nil ; too slow
+          evil-goggles-enable-delete nil
+          evil-goggles-enable-change nil)
     (evil-goggles-mode))
 #+end_src
 
