@@ -702,6 +702,7 @@ Make ESC qui prompts.
    "s" '(:ignore t :which-key "search")
    "ss" '(consult-line :which-key "Search buffer")
    "sb" '(consult-line :which-key "Search buffer")
+   "sp" '(consult-ripgrep :which-key "Search project")
 
    "t" '(:ignore t :which-key "toggle")
    "tw" '(toggle-truncate-lines :which-key "Lines wrapping")
