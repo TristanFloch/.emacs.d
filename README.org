@@ -523,6 +523,7 @@ Fuzzy search completion
 
 #+begin_src emacs-lisp
   (use-package orderless
+    :after vertico
     :init
     (setq completion-styles '(orderless)
           completion-category-defaults nil
@@ -544,11 +545,12 @@ Builtin package to remember history for commands
                 ("C-k" . vertico-previous)
                 :map minibuffer-local-map
                 ("<backspace>" . vertico-directory-delete-char))
-
     :custom
     (vertico-cycle t)
     :init
-    (vertico-mode))
+    (vertico-mode)
+    :config
+    (add-hook 'minibuffer-setup-hook #'vertico-repeat-save))
   #+end_src
 
 Adds information for completions
@@ -565,9 +567,11 @@ Adds information for completions
 Addon for icons in marginalia mode
 
 #+begin_src emacs-lisp
-  (use-package all-the-icons-completion
-    :hook
-    (add-hook 'marginalia-mode-hook #'all-the-icons-completion-marginalia-setup))
+(use-package all-the-icons-completion
+  :after (marginalia all-the-icons)
+  :hook (marginalia-mode . all-the-icons-completion-marginalia-setup)
+  :init
+  (all-the-icons-completion-mode))
 #+end_src
 
 ** Consult
@@ -576,6 +580,7 @@ Front end for vertico
 
 #+begin_src emacs-lisp
   (use-package consult
+    :hook (completion-list-mode . consult-preview-at-point-mode)
     :init
     ;; Optionally tweak the register preview window.
     ;; This adds thin lines, sorting and hides the mode line of the window.
@@ -599,6 +604,7 @@ Front end for vertico
     )
 
   (use-package consult-dir
+    :after consult
     :bind (([remap list-directory] . consult-dir)
            :map vertico-map
            ("C-x C-d" . consult-dir)
@@ -704,6 +710,7 @@ Make ESC qui prompts.
   (tf/leader-keys
    "." '(find-file :which-key "Find file")
    "`" '(evil-switch-to-windows-last-buffer :which-key "Switch to last buffer")
+   "'" '(vertico-repeat :which-key "Repeat last search")
    "SPC" '(consult-find :which-key "Find file")
 
    "b" '(:ignore t :which-key "buffers")
@@ -1097,14 +1104,6 @@ Spaces instead of tabs
     :hook (prog-mode . rainbow-delimiters-mode))
 #+end_src
 
-* Languages
-** Nix
-
-#+begin_src emacs-lisp
-(use-package nix-mode
-  :mode "\\.nix\\'")
-#+end_src
-
 * Projects
 
 #+begin_src emacs-lisp
@@ -1199,6 +1198,13 @@ The keybinding needs to be added.
 - Improve completion with more packages: https://github.com/minad/corfu#complementary-packages
 
 #+begin_src emacs-lisp
+(defun corfu-enable-always-in-minibuffer ()
+  "Enable Corfu in the minibuffer if Vertico/Mct are not active."
+  (unless (or (bound-and-true-p mct--active)
+              (bound-and-true-p vertico--input))
+      ;; (setq-local corfu-auto nil) Enable/disable auto completion
+      (corfu-mode 1)))
+
   (use-package corfu
     :custom
     (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
@@ -1226,8 +1232,15 @@ The keybinding needs to be added.
     ;; Recommended: Enable Corfu globally.
     ;; This is recommended since dabbrev can be used globally (M-/).
     :init
-    (corfu-global-mode))
+    (corfu-global-mode)
+    :config
+    (setq corfu-auto-delay 0.0 ; default is 0.2
+          corfu-echo-documentation 0.5 ; default is (1.0 . 2.0)
+          )
+    (add-hook 'minibuffer-setup-hook #'corfu-enable-always-in-minibuffer 1))
 #+end_src
+
+Backend for corfu
 
 #+begin_src emacs-lisp
   (use-package cape
@@ -1272,6 +1285,14 @@ The keybinding needs to be added.
     (kind-icon-default-face 'corfu-default) ; to compute blended backgrounds correctly
     :config
     (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
+#+end_src
+
+* Languages
+** Nix
+
+#+begin_src emacs-lisp
+(use-package nix-mode
+  :mode "\\.nix\\'")
 #+end_src
 
 * Literate
