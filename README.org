@@ -1292,6 +1292,13 @@ Backend for corfu
   :mode "\\.vhdl\\'")
 #+end_src
 
+** CSS
+
+#+begin_src emacs-lisp
+(use-package css-mode
+  :mode "\\.rasi\\'")
+#+end_src
+
 * Literate
 
 Keep a custom file to not pollute this one
