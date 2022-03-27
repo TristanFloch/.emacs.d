@@ -327,6 +327,23 @@ Prevent the display of line numbers for some modes:
   (setq nyan-animate-nyancat t))
 #+end_src
 
+** Tree sitter
+
+#+begin_src emacs-lisp
+(use-package tree-sitter
+  :hook
+  (c++-mode     . tree-sitter-mode)
+  (c-mode       . tree-sitter-mode)
+  (python-mode  . tree-sitter-mode)
+  (nix-mode     . tree-sitter-mode)
+  :config
+  ;; (global-tree-sitter-mode)
+  (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode))
+
+(use-package tree-sitter-langs
+  :after tree-sitter)
+#+end_src
+
 * Which Key
 
 #+begin_src emacs-lisp
