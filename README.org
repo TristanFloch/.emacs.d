@@ -1285,6 +1285,13 @@ Backend for corfu
   :mode "\\.nix\\'")
 #+end_src
 
+** VHDL
+
+#+begin_src emacs-lisp
+(use-package vhdl-mode
+  :mode "\\.vhdl\\'")
+#+end_src
+
 * Literate
 
 Keep a custom file to not pollute this one
