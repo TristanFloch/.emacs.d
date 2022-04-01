@@ -284,7 +284,9 @@ Prevent the display of line numbers for some modes:
                   eshell-mode-hook
                   treemacs-mode-hook
                   dired-mode-hook
-                  calendar-mode-hook))
+                  calendar-mode-hook
+                  pdf-view-mode-hook
+                  dashboard-mode-hook))
     (add-hook mode (lambda () (display-line-numbers-mode 0))))
 #+end_src
 
@@ -1343,11 +1345,35 @@ Backend for corfu
   :mode "\\.vhdl\\'")
 #+end_src
 
-** CSS
+#+begin_src emacs-lisp
+(use-package vhdl-capf
+  ;;:after vhdl-mode
+  :config
+  (vhdl-capf-enable))
+#+end_src
+
+** Rasi
 
 #+begin_src emacs-lisp
 (use-package css-mode
   :mode "\\.rasi\\'")
+#+end_src
+
+** C
+
+#+begin_src emacs-lisp
+(use-package clang-format
+  :commands (clang-format-buffer clang-format-region)
+  :init
+  (tf/leader-key
+   :keymaps '(c-mode-map c++-mode-map)
+   :states 'normal
+   "c" '(:ignore :which-key "code")
+   "cf" '(clang-format-buffer :which-key "Clang-format buffer")))
+#+end_src
+
+#+begin_src emacs-lisp
+(setq c-default-style "user")
 #+end_src
 
 ** Rust
@@ -1369,6 +1395,14 @@ Backend for corfu
     "pc" '(rust-compile :which-key "Compile project"))
   (prettify-symbols-mode)
   )
+#+end_src
+
+* PDFs
+
+#+begin_src emacs-lisp
+(use-package pdf-tools
+  :mode "\\.pdf\\'"
+  :init (pdf-tools-install))
 #+end_src
 
 * Literate
