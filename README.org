@@ -1212,39 +1212,42 @@ The keybinding needs to be added.
       ;; (setq-local corfu-auto nil) Enable/disable auto completion
       (corfu-mode 1)))
 
-  (use-package corfu
-    :custom
-    (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
-    (corfu-auto t)                 ;; Enable auto completion
-    (corfu-separator ?\s)          ;; Orderless field separator
-    ;; (corfu-quit-at-boundary nil)   ;; Never quit at completion boundary
-    ;; (corfu-quit-no-match nil)      ;; Never quit, even if there is no match
-    (corfu-preview-current nil)    ;; Disable current candidate preview
-    ;; (corfu-preselect-first nil)    ;; Disable candidate preselection
-    ;; (corfu-on-exact-match nil)     ;; Configure handling of exact matches
-    ;; (corfu-echo-documentation nil) ;; Disable documentation in the echo area
-    ;; (corfu-scroll-margin 5)        ;; Use scroll margin
+(use-package corfu
+  :custom
+  (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
+  (corfu-auto t)                 ;; Enable auto completion
+  (corfu-separator ?\s)          ;; Orderless field separator
+  ;; (corfu-quit-at-boundary nil)   ;; Never quit at completion boundary
+  ;; (corfu-quit-no-match nil)      ;; Never quit, even if there is no match
+  (corfu-preview-current nil)    ;; Disable current candidate preview
+  ;; (corfu-preselect-first nil)    ;; Disable candidate preselection
+  ;; (corfu-on-exact-match nil)     ;; Configure handling of exact matches
+  ;; (corfu-echo-documentation nil) ;; Disable documentation in the echo area
+  ;; (corfu-scroll-margin 5)        ;; Use scroll margin
 
-    ;; You may want to enable Corfu only for certain modes.
-    ;; :hook ((prog-mode . corfu-mode)
-    ;;        (shell-mode . corfu-mode)
-    ;;        (eshell-mode . corfu-mode))
+  ;; You may want to enable Corfu only for certain modes.
+  ;; :hook ((prog-mode . corfu-mode)
+  ;;        (shell-mode . corfu-mode)
+  ;;        (eshell-mode . corfu-mode))
 
-    :bind (:map corfu-map
-                ("TAB" . corfu-next)
-                ([tab] . corfu-next)
-                ("S-TAB" . corfu-previous)
-                ([backtab] . corfu-previous))
+  :bind (:map corfu-map
+              ("ESC" . corfu-reset)
+              ("TAB" . corfu-next)
+              ([tab] . corfu-next)
+              ("C-j" . corfu-next)
+              ("S-TAB" . corfu-previous)
+              ([backtab] . corfu-previous)
+              ("C-k" . corfu-previous))
 
-    ;; Recommended: Enable Corfu globally.
-    ;; This is recommended since dabbrev can be used globally (M-/).
-    :init
-    (corfu-global-mode)
-    :config
-    (setq corfu-auto-delay 0.0 ; default is 0.2
-          corfu-echo-documentation 0.5 ; default is (1.0 . 2.0)
-          )
-    (add-hook 'minibuffer-setup-hook #'corfu-enable-always-in-minibuffer 1))
+  ;; Recommended: Enable Corfu globally.
+  ;; This is recommended since dabbrev can be used globally (M-/).
+  :init
+  (corfu-global-mode)
+  :config
+  (setq corfu-auto-delay 0.0 ; default is 0.2
+        corfu-echo-documentation 0.5 ; default is (1.0 . 2.0)
+        )
+  (add-hook 'minibuffer-setup-hook #'corfu-enable-always-in-minibuffer 1))
 #+end_src
 
 Backend for corfu
