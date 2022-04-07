@@ -1308,7 +1308,7 @@ Backend for corfu
   (rust-mode . eglot-ensure)
   :config
   (setq eglot-autoshutdown t
-        ;; eglot-ignored-server-capabilities '(list :hoverProvider)
+        eldoc-idle-delay 2.5 ;; long delay to avoid anoying popup
         )
   ;; TODO define this only for eglot keymap
   (tf/global-leader-keys
