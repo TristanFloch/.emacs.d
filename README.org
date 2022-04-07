@@ -1131,6 +1131,7 @@ Spaces instead of tabs
 
 #+begin_src emacs-lisp
   (tf/global-leader-keys
+    "SPC" '(projectile-find-file :which-key "Find file in project")
     "p" '(:ignore t :which-key "project")
     "p p" '(projectile-switch-project :which-key "Switch project")
     "p a" '(projectile-add-known-project :which-key "Add new project")
@@ -1140,8 +1141,6 @@ Spaces instead of tabs
     "p k" '(projectile-kill-buffers :which-key "Kill project buffers")
     "p c" '(projectile-compile-project :which-key "Compile project")
     "p f" '(projectile-find-file :which-key "Find file in project")
-
-  ;; TODO search project files with consult-ripgrep
     )
 #+end_src
 
