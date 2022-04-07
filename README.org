@@ -1118,6 +1118,22 @@ Spaces instead of tabs
   (direnv-mode))
 #+end_src
 
+** Compile
+
+#+begin_src emacs-lisp
+(use-package ansi-color
+  :config
+  (defun my/colorize-compilation-buffer ()
+    (when (eq major-mode 'compilation-mode)
+      (ansi-color-apply-on-region compilation-filter-start (point-max))))
+  :hook (compilation-filter . my/colorize-compilation-buffer))
+#+end_src
+
+#+begin_src emacs-lisp
+(with-eval-after-load 'compile
+  (setq compilation-scroll-output t))
+#+end_src
+
 * Projects
 
 #+begin_src emacs-lisp
