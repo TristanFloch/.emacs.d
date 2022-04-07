@@ -4,6 +4,11 @@
 #+PROPERTY: header-args :results silent :tangle "./init.el"
 #+STARTUP: overview
 
+This is my GNU Emacs configuration.
+I actually use [[https://github.com/hlissner/doom-emacs][Doom Emacs]], this is mainly for fun and to try some stuff out.
+
+This file is tangled (on save) to =~/.emacs.d/init.el= using a buffer local variable (see EOF).
+
 * Package management
 ** Setup package.el to work with MELPA, ELPA and ORG
 
