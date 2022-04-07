@@ -225,6 +225,12 @@ This is just for consistency inside the session as those are disabled in early-i
     (load-theme 'doom-dracula t))
 #+end_src
 
+#+begin_src emacs-lisp
+(use-package solaire-mode
+  :after doom-themes
+  :config (solaire-global-mode))
+#+end_src
+
 ** Fonts
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
