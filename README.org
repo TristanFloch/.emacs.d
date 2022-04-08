@@ -1166,6 +1166,41 @@ This is a better checker than the default Emacs Flymake.
   )
 #+end_src
 
+* Treemacs
+
+#+begin_src emacs-lisp
+(use-package treemacs
+  :defer t
+  :init
+  (tf/leader-key
+    :states 'normal
+    "o" '(:ignore :which-key "open")
+    "op" '(treemacs :which-key "Project sidebar"))
+  :config
+  (setq treemacs-show-cursor t
+        treemacs-workspace-switch-cleanup t
+        treemacs-project-follow-mode t
+        treemacs-project-follow-cleanup t))
+
+(use-package treemacs-evil
+  :after (treemacs evil)
+  :config
+  (general-define-key
+   :keymaps 'evil-treemacs-state-map
+    [return] #'treemacs-RET-action
+    [tab]    #'treemacs-TAB-action
+    "TAB"    #'treemacs-TAB-action
+    "o v"    #'treemacs-visit-node-horizontal-split
+    "o s"    #'treemacs-visit-node-vertical-split)
+  (tf/leader-key
+    :keymaps 'evil-treemacs-state-map
+    "o" '(:ignore :which-key "open")
+    "op" '(treemacs-quit :which-key "Project sidebar")))
+
+(use-package treemacs-projectile
+  :after (treemacs projectile))
+#+end_src
+
 * Projects
 
 #+begin_src emacs-lisp
