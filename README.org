@@ -221,13 +221,15 @@ This is just for consistency inside the session as those are disabled in early-i
 
 #+begin_src emacs-lisp
   (use-package doom-themes
-    :ensure t
     :config
-
+    (doom-themes-treemacs-config)
+    (doom-themes-org-config)
     (setq doom-themes-enable-bold t
-          doom-themes-enable-italic t)
-
-    (load-theme 'doom-dracula t))
+          doom-themes-enable-italic t
+          doom-themes-treemacs-enable-variable-pitch nil
+          doom-themes-treemacs-theme "doom-atom")
+    (load-theme 'doom-dracula t)
+    )
 #+end_src
 
 #+begin_src emacs-lisp
