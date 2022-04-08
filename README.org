@@ -1428,12 +1428,15 @@ This was stolen from Doom.
       (setq +lsp--optimization-init-p t))))
 #+end_src
 
-** COMMENT LSP mode
+** LSP mode
 
 #+begin_src emacs-lisp
 (use-package lsp-mode
   :commands lsp
-  :hook (lsp-mode . lsp-enable-which-key-integration)
+  :custom (lsp-completion-provider :none) ;; use corfu instead
+  :hook
+  (lsp-mode . lsp-enable-which-key-integration)
+  (lsp-completion-mode . my/lsp-mode-setup-completion)
   :init
   (setq lsp-keymap-prefix nil ;; do it later
         read-process-output-max (* 1024 1024) ;; 1mb
@@ -1442,6 +1445,17 @@ This was stolen from Doom.
         lsp-headerline-breadcrumb-enable t
         lsp-headerline-breadcrumb-segments '(project file symbols)
         lsp-enable-suggest-server-download nil)
+
+  ;; taken from corfu wiki
+  (defun my/orderless-dispatch-flex-first (_pattern index _total)
+    (and (eq index 0) 'orderless-flex))
+
+  (defun my/lsp-mode-setup-completion ()
+    (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
+          '(orderless)))
+  ;; configure the cape-capf-buster.
+  (setq-local completion-at-point-functions (list (cape-capf-buster #'lsp-completion-at-point)))
+
   :config
   (add-hook 'doom-escape-hook
     (defun +lsp-signature-stop-maybe-h ()
@@ -1449,13 +1463,18 @@ This was stolen from Doom.
       (when lsp-signature-mode
         (lsp-signature-stop)
         t)))
+  (general-define-key
+   :keymaps 'lsp-mode-map
+   :states 'normal
+    "K" #'lsp-describe-thing-at-point)
   )
 
 (use-package consult-lsp
   :defer t ;; HACK can't be loaded after lsp-mode
   :init
-  (define-key lsp-mode-map
-    [remap xref-find-apropos] #'consult-lsp-symbols))
+  (general-define-key
+   :keymaps 'lsp-mode-map
+   [remap xref-find-apropos] #'consult-lsp-symbols))
 #+end_src
 
 #+begin_src emacs-lisp
