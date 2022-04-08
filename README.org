@@ -1139,6 +1139,31 @@ Spaces instead of tabs
   (setq compilation-scroll-output t))
 #+end_src
 
+** Flycheck
+
+This is a better checker than the default Emacs Flymake.
+
+#+begin_src emacs-lisp
+(use-package flycheck
+  :commands (flycheck-list-errors flycheck-buffer)
+  :hook (after-init . global-flycheck-mode)
+  :config
+  (setq flycheck-emacs-lisp-load-path 'inherit
+        flycheck-idle-change-delay 1.0
+        ;; For the above functionality, check syntax in a buffer that you switched to
+        ;; only briefly. This allows "refreshing" the syntax check state for several
+        ;; buffers quickly after e.g. changing a config file.
+        flycheck-buffer-switch-check-intermediat-buffers t
+        flycheck-display-error-delay 0.25)
+  (add-hook 'doom-escape-hook :append
+            (defun +syntax-check-buffer-h ()
+              "Flycheck buffer on ESC in normal mode."
+              (when flycheck-mode
+                (ignore-errors (flycheck-buffer))
+                nil)))
+  )
+#+end_src
+
 * Projects
 
 #+begin_src emacs-lisp
