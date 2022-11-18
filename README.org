@@ -1341,7 +1341,7 @@ The keybinding needs to be added.
   ;; Recommended: Enable Corfu globally.
   ;; This is recommended since dabbrev can be used globally (M-/).
   :init
-  (corfu-global-mode)
+  (global-corfu-mode)
   :config
   (setq corfu-auto-delay 0.0 ; default is 0.2
         corfu-echo-documentation 0.5 ; default is (1.0 . 2.0)
