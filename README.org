@@ -1396,6 +1396,15 @@ Backend for corfu
     (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
 #+end_src
 
+** Snippets
+
+#+begin_src emacs-lisp
+(use-package yasnippet
+  :defer t
+  ;; TODO configure yas-snippet-dirs
+  :init (yas-global-mode 1))
+#+end_src
+
 * LSP
 ** LSP optimization mode
 
