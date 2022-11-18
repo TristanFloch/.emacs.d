@@ -286,23 +286,12 @@ Explicitly define a width to reduce the cost of on-the-fly computation
 #+end_src
 
 #+begin_src emacs-lisp
-  (column-number-mode)
-  (global-display-line-numbers-mode t)
+(column-number-mode)
+(add-hook 'prog-mode-hook #'display-line-numbers-mode)
+(add-hook 'org-mode-hook #'display-line-numbers-mode)
 #+end_src
 
-Prevent the display of line numbers for some modes:
-
-#+begin_src emacs-lisp
-  (dolist (mode '(term-mode-hook
-                  eshell-mode-hook
-                  treemacs-mode-hook
-                  dired-mode-hook
-                  calendar-mode-hook
-                  pdf-view-mode-hook
-                  dashboard-mode-hook
-                  image-mode-hook))
-    (add-hook mode (lambda () (display-line-numbers-mode 0))))
-#+end_src
+NOTE: line numbers can also be enabled globally.
 
 ** Cursor
 
