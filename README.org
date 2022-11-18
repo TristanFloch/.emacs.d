@@ -1108,11 +1108,21 @@ Spaces instead of tabs
   (setq-default indent-tabs-mode nil)
 #+end_src
 
-** Rainbow delimiters
+** Parens
 
 #+begin_src emacs-lisp
   (use-package rainbow-delimiters
     :hook (prog-mode . rainbow-delimiters-mode))
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package smartparens
+  :hook
+  (add-hook 'prog-mode-hook #'smartparens-mode))
+
+(use-package evil-smartparens
+  :hook
+  (add-hook 'smartparens-enabled-hook #'evil-smartparens-mode))
 #+end_src
 
 ** Direnv
